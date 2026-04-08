@@ -402,7 +402,7 @@ let faceMesh, cam;
 // 평활화 — 가중 이동평균
 const buf = [];
 // 모바일은 버퍼 작게(반응성↑), 데스크탑은 크게(안정성↑)
-const BUF_N = IS_MOBILE ? 3 : 5;
+const BUF_N = IS_MOBILE ? 8 : 5;
 
 function smooth(x, y) {
   buf.push({x, y});
@@ -415,8 +415,8 @@ function smooth(x, y) {
 
 // 깜빡임 억제 — 깜빡임 감지 후 N프레임 동안 좌표 고정
 let blinkCooldown = 0;      // 남은 억제 프레임 수
-const BLINK_SUPPRESS = IS_MOBILE ? 4 : 6;
-const BLINK_THRESH   = IS_MOBILE ? 0.015 : 0.018;
+const BLINK_SUPPRESS = IS_MOBILE ? 7 : 6;
+const BLINK_THRESH   = IS_MOBILE ? 0.02 : 0.018;
 
 // 보정 데이터
 const cal = [];   // {rx, ry, sx, sy}
@@ -461,33 +461,9 @@ function initFaceMesh() {
     }
     if (blinkCooldown > 0) { blinkCooldown--; return; }
 
-    // iris 기본 좌표
-    const rx_iris = 1-(lI.x+rI.x)/2;
-    const ry_iris = (lI.y+rI.y)/2;
-
-    let rx, ry;
-    if (IS_MOBILE) {
-      // 모바일: 얼굴 방향(head pose) 반영
-      // 코 끝(1)과 눈 중심으로 고개 기울기 추정
-      const nose = lm[1];
-      const eyeMidX = (lI.x + rI.x) / 2;
-      const eyeMidY = (lI.y + rI.y) / 2;
-      // 코-눈 벡터로 머리 회전 오프셋 계산
-      const headOffsetX = (nose.x - eyeMidX) * 2.5;
-      const headOffsetY = (nose.y - eyeMidY) * 1.8;
-      // 눈 코너 대비 iris 상대 위치
-      const lInner=lm[133], lOuter=lm[33];
-      const rInner=lm[362], rOuter=lm[263];
-      const lEyeW = Math.abs(lOuter.x - lInner.x) || 0.01;
-      const rEyeW = Math.abs(rOuter.x - rInner.x) || 0.01;
-      const irisRatioX = 1 - ((lI.x-lInner.x)/lEyeW + (rI.x-rInner.x)/rEyeW) / 2;
-      // iris 비율 50% + iris 절대 30% + 머리방향 20%
-      rx = irisRatioX * 0.5 + rx_iris * 0.3 + (1 - (eyeMidX + headOffsetX)) * 0.2;
-      ry = ry_iris * 0.8 + (eyeMidY + headOffsetY) * 0.2;
-    } else {
-      rx = rx_iris;
-      ry = ry_iris;
-    }
+    // iris 평균 → 미러 반전
+    const rx = 1-(lI.x+rI.x)/2;
+    const ry = (lI.y+rI.y)/2;
 
     lastRaw = {x:rx, y:ry};
     const sm = smooth(rx, ry);
