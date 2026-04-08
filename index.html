@@ -8,11 +8,11 @@
 
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min-height:100vh;overflow-x:hidden}
+html,body{background:#000;color:#fff;font-family:"neue-haas-grotesk-display",sans-serif;min-height:100vh;overflow-x:hidden}
 
 /* 시작 화면 */
-#scr-start{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;z-index:100;padding:2rem}
-#scr-start .title{font-family:"psfournier-std",sans-serif;font-size:28px;letter-spacing:0.01em;font-weight:300;color:#fff;display:flex;flex-direction:column;align-items:center;line-height:0.9;text-align:center;pointer-events:none}
+#scr-start{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2rem;z-index:100;padding:80px 40px 40px}
+#scr-start .title{font-family:"neue-haas-grotesk-display",sans-serif;font-size:28px;letter-spacing:0.01em;font-weight:300;color:#fff;display:flex;flex-direction:column;align-items:center;line-height:0.9;text-align:center;pointer-events:none}
 #scr-start .warn{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#c84b1e;letter-spacing:0.08em;text-align:center}
 #scr-start .sub{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#555;letter-spacing:0.08em;text-align:center;line-height:1.9}
 .btn{background:transparent;border:1px solid #333;color:#888;padding:13px 40px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.25em;cursor:pointer;text-transform:uppercase;transition:border-color .3s,color .3s}
@@ -43,8 +43,8 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 #reader{display:none;max-width:720px;margin:0 auto;padding:80px 40px 100px}
 @media(max-width:600px){#reader{padding:60px 16px 90px}#btn-mouse{display:none}}
 #doc-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#2a2a2a;margin-bottom:56px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:16px}
-.para{margin-bottom:1.6em;line-height:1.5;font-size:15px;color:#fff;font-family:"psfournier-std",sans-serif;font-weight:300;letter-spacing:0.04em}
-#txt{display:flex;flex-direction:column}.spk{font-family:"psfournier-std",sans-serif;font-size:15px;font-weight:300;color:#555;display:block;padding-top:1px;text-align:right;padding-right:0}.para{margin-bottom:1.2em}
+.para{margin-bottom:1.6em;line-height:1.5;font-size:15px;color:#fff;font-family:"neue-haas-grotesk-display",sans-serif;font-weight:300;letter-spacing:0.04em}
+#txt{display:flex;flex-direction:column}.spk{font-family:"neue-haas-grotesk-display",sans-serif;font-size:15px;font-weight:300;color:#555;display:block;padding-top:1px;text-align:right;padding-right:0}.para{margin-bottom:1.2em}
 .ch{display:inline}
 
 
@@ -53,7 +53,7 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 #scr-done{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:100;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
 #scr-done p{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#555;letter-spacing:0.2em;text-align:center;line-height:2}
 #scr-done .big{font-size:13px;color:#444}
-.spk-row{display:grid;grid-template-columns:72px 1fr;column-gap:24px;margin-top:0;margin-bottom:1.6em;align-items:start}.spk{font-family:"psfournier-std",sans-serif;font-size:15px;font-weight:300;color:#555;line-height:inherit;padding-top:1px;text-align:left;white-space:nowrap}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{margin-left:96px}</style>
+.spk-row{display:grid;grid-template-columns:72px 1fr;column-gap:24px;margin-top:0;margin-bottom:1.6em;align-items:start}.spk{font-family:"neue-haas-grotesk-display",sans-serif;font-size:15px;font-weight:300;color:#555;line-height:inherit;padding-top:1px;text-align:left;white-space:nowrap}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{margin-left:96px}</style>
 <link rel="stylesheet" href="https://use.typekit.net/azt6kde.css">
 </head>
 <body>
@@ -455,16 +455,40 @@ function initFaceMesh() {
       const rOpen = Math.abs(rB.y - rT.y);
       const avgOpen = (lOpen + rOpen) / 2;
       if (avgOpen < BLINK_THRESH) {
-        // 깜빡임 감지 → 쿨다운 리셋하고 이번 프레임 무시
         blinkCooldown = BLINK_SUPPRESS;
         return;
       }
     }
-    // 쿨다운 중이면 좌표 업데이트 안 함 (점 제자리 유지)
     if (blinkCooldown > 0) { blinkCooldown--; return; }
-    // iris 평균 → 미러 반전
-    const rx = 1-(lI.x+rI.x)/2;
-    const ry = (lI.y+rI.y)/2;
+
+    // iris 기본 좌표
+    const rx_iris = 1-(lI.x+rI.x)/2;
+    const ry_iris = (lI.y+rI.y)/2;
+
+    let rx, ry;
+    if (IS_MOBILE) {
+      // 모바일: 얼굴 방향(head pose) 반영
+      // 코 끝(1)과 눈 중심으로 고개 기울기 추정
+      const nose = lm[1];
+      const eyeMidX = (lI.x + rI.x) / 2;
+      const eyeMidY = (lI.y + rI.y) / 2;
+      // 코-눈 벡터로 머리 회전 오프셋 계산
+      const headOffsetX = (nose.x - eyeMidX) * 2.5;
+      const headOffsetY = (nose.y - eyeMidY) * 1.8;
+      // 눈 코너 대비 iris 상대 위치
+      const lInner=lm[133], lOuter=lm[33];
+      const rInner=lm[362], rOuter=lm[263];
+      const lEyeW = Math.abs(lOuter.x - lInner.x) || 0.01;
+      const rEyeW = Math.abs(rOuter.x - rInner.x) || 0.01;
+      const irisRatioX = 1 - ((lI.x-lInner.x)/lEyeW + (rI.x-rInner.x)/rEyeW) / 2;
+      // iris 비율 50% + iris 절대 30% + 머리방향 20%
+      rx = irisRatioX * 0.5 + rx_iris * 0.3 + (1 - (eyeMidX + headOffsetX)) * 0.2;
+      ry = ry_iris * 0.8 + (eyeMidY + headOffsetY) * 0.2;
+    } else {
+      rx = rx_iris;
+      ry = ry_iris;
+    }
+
     lastRaw = {x:rx, y:ry};
     const sm = smooth(rx, ry);
     const mp = mapGaze(sm.x, sm.y);
