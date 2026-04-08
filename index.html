@@ -8,7 +8,7 @@
 
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{background:#000;color:#fff;font-family:"neue-haas-grotesk-display",sans-serif;min-height:100vh;overflow-x:hidden}
+html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min-height:100vh;overflow-x:hidden}
 
 /* 시작 화면 */
 #scr-start{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2rem;z-index:100;padding:80px 40px 40px}
@@ -43,8 +43,8 @@ html,body{background:#000;color:#fff;font-family:"neue-haas-grotesk-display",san
 #reader{display:none;max-width:720px;margin:0 auto;padding:80px 40px 100px}
 @media(max-width:600px){#reader{padding:60px 16px 90px}#btn-mouse{display:none}}
 #doc-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.3em;color:#2a2a2a;margin-bottom:56px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:16px}
-.para{margin-bottom:1.6em;line-height:1.5;font-size:15px;color:#fff;font-family:"neue-haas-grotesk-display",sans-serif;font-weight:300;letter-spacing:0.04em}
-#txt{display:flex;flex-direction:column}.spk{font-family:"neue-haas-grotesk-display",sans-serif;font-size:15px;font-weight:300;color:#555;display:block;padding-top:1px;text-align:right;padding-right:0}.para{margin-bottom:1.2em}
+.para{margin-bottom:1.6em;line-height:1.5;font-size:15px;color:#fff;font-family:"psfournier-std",sans-serif;font-weight:300;letter-spacing:0.04em}
+#txt{display:flex;flex-direction:column}.spk{font-family:"psfournier-std",sans-serif;font-size:15px;font-weight:300;color:#555;display:block;padding-top:1px;text-align:right;padding-right:0}.para{margin-bottom:1.2em}
 .ch{display:inline}
 
 
@@ -53,7 +53,7 @@ html,body{background:#000;color:#fff;font-family:"neue-haas-grotesk-display",san
 #scr-done{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:100;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
 #scr-done p{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#555;letter-spacing:0.2em;text-align:center;line-height:2}
 #scr-done .big{font-size:13px;color:#444}
-.spk-row{display:grid;grid-template-columns:72px 1fr;column-gap:24px;margin-top:0;margin-bottom:1.6em;align-items:start}.spk{font-family:"neue-haas-grotesk-display",sans-serif;font-size:15px;font-weight:300;color:#555;line-height:inherit;padding-top:1px;text-align:left;white-space:nowrap}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{margin-left:96px}</style>
+.spk-row{display:grid;grid-template-columns:72px 1fr;column-gap:24px;margin-top:0;margin-bottom:1.6em;align-items:start}.spk{font-family:"psfournier-std",sans-serif;font-size:15px;font-weight:300;color:#555;line-height:inherit;padding-top:1px;text-align:left;white-space:nowrap}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{margin-left:96px}@media(max-width:600px){#scr-start{align-items:center;padding:80px 24px 40px}#scr-start .title{align-items:center;text-align:center}.para.no-spk{margin-left:0}.spk-row{grid-template-columns:60px 1fr;column-gap:16px}#reader{padding:60px 24px 90px}}</style>
 <link rel="stylesheet" href="https://use.typekit.net/azt6kde.css">
 </head>
 <body>
