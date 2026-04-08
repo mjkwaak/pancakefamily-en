@@ -50,9 +50,9 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 #scr-start{align-items:center;justify-content:center;padding:40px 20px}
 #scr-start .title{align-items:center;text-align:center}
 #btn-mouse{display:none}
-#reader{padding:20vh 16px 90px}
-.spk-row{display:flex;flex-direction:column;gap:2px;margin-bottom:1.4em}
-.para.no-spk{padding-left:0;margin-bottom:1.4em}
+#reader{padding:20vh 12px 90px}
+.spk-row{display:grid;grid-template-columns:40px 1fr;column-gap:8px;margin-bottom:1.4em;align-items:start}
+.para.no-spk{padding-left:48px;margin-bottom:1.4em}
 .para{margin-bottom:1.4em}
 }
 </style>
@@ -400,7 +400,7 @@ const buf = [];
 const BUF_N = 5; // 데스크탑용 버퍼
 // EMA 상태 (모바일용)
 let emaX = -1, emaY = -1;
-const EMA_ALPHA = IS_MOBILE ? 0.07 : 1; // 낮을수록 부드러움
+const EMA_ALPHA = IS_MOBILE ? 0.05 : 1; // 낮을수록 부드러움
 
 function smooth(x, y) {
   if (IS_MOBILE) {
@@ -447,7 +447,7 @@ function mapGaze(rx, ry) {
 
 function initFaceMesh() {
   faceMesh = new FaceMesh({locateFile: f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`});
-  faceMesh.setOptions({maxNumFaces:1, refineLandmarks:true, minDetectionConfidence:.4, minTrackingConfidence:.4});
+  faceMesh.setOptions({maxNumFaces:1, refineLandmarks:true, minDetectionConfidence:.3, minTrackingConfidence:.3});
   faceMesh.onResults(res => {
     if (!res.multiFaceLandmarks?.[0]) return;
     const lm = res.multiFaceLandmarks[0];
@@ -480,9 +480,17 @@ function initFaceMesh() {
 function startCam() {
   const v = document.getElementById('vid');
   v.style.display = 'block';
+  let frameCount = 0;
   cam = new Camera(v, {
-    onFrame: async () => { await faceMesh.send({image:v}); },
-    width: IS_MOBILE ? 480 : 640, height: IS_MOBILE ? 360 : 480,
+    onFrame: async () => {
+      // 모바일: 2프레임마다 1번 처리 (CPU 부하 절반)
+      if (IS_MOBILE) {
+        frameCount++;
+        if (frameCount % 2 !== 0) return;
+      }
+      await faceMesh.send({image:v});
+    },
+    width: IS_MOBILE ? 320 : 640, height: IS_MOBILE ? 240 : 480,
   });
   cam.start();
 }
