@@ -53,7 +53,7 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 #scr-done{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:100;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
 #scr-done p{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#555;letter-spacing:0.2em;text-align:center;line-height:2}
 #scr-done .big{font-size:13px;color:#444}
-.spk-row{display:grid;grid-template-columns:72px 1fr;column-gap:24px;margin-top:2em}.spk{font-family:"psfournier-std",sans-serif;font-size:15px;font-weight:300;color:#555;line-height:inherit;padding-top:1px;text-align:left;white-space:nowrap}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{margin-left:96px}</style>
+.spk-row{display:grid;grid-template-columns:72px 1fr;column-gap:24px;margin-top:2em;margin-bottom:1.4em;align-items:start}.spk{font-family:"psfournier-std",sans-serif;font-size:15px;font-weight:300;color:#555;line-height:inherit;padding-top:1px;text-align:left;white-space:nowrap}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{margin-left:96px}</style>
 <link rel="stylesheet" href="https://use.typekit.net/azt6kde.css">
 </head>
 <body>
@@ -138,6 +138,7 @@ const RAW=[
   {s:null,t:"Let's see, it would have been twenty years ago now. Thinking of all those years… I mean, twenty goddamn years. That's a long time to be…"},
   {s:"Interviewer",t:"Take your time, Hob."},
   {s:null,t:"Thanks."},
+  {s:null,t:"[Throat Clearing]"},
   {s:null,t:"The Driscolls were a family of six out in the suburbs. Upper middle class. Father was an attorney, mother ran her own business selling pottery out of the house. Four children, all high school age and below. Good kids. Honor roll. No criminal records to speak of. The oldest son was caught smoking dope at his high school once, but nothing much besides that. Just the typical stuff you find when you look at people too closely."},
   {s:null,t:"They disappeared October 13th, 1994. No trace was found of the bodies. The mystery and seeing as how it was right around Halloween is probably why the press went so crazy. You still see it show up on some of those unsolved mystery shows. A whole family disappeared and no one saw a thing. No one knew where they went."},
   {s:null,t:"A neighbor lodged a sound complaint, which is how we got involved. There was an alarm going off and they figured it might be an intruder or something. We dispatched a vehicle. When no one answered the door, the patrolman went in to investigate."},
@@ -146,7 +147,7 @@ const RAW=[
   {s:null,t:"The investigation gave no leads."},
   {s:null,t:"Of course, our first thought was that the father did it. We checked it out but he didn't have motive. No leads to follow up on. Same with the mother. Surviving family checked out clean, too. The father had a few clients who might have had motive, but the means weren't there. He was a divorce lawyer, but not for anybody who could have taken out an entire family without leaving evidence. There was a chemistry teacher who lived three blocks away and we investigated him for a while because of the canisters but he alibied out. Same with a dentist who lived nearby. The wife had an online flirtation with some kid out in England but nothing adulterous and he wasn't even in the country at the time of the murder."},
   {s:null,t:"We settled, unhappily, on the idea of a random killing. Hardest pieces of shit to catch when there's no pattern like that. We must have sunk tens of thousands of man hours into this case, chasing down leads. Nothing ever came of any of it."},
-  {s:null,t:"We did track down the canisters. They were stolen from a laboratory ten miles away. There was no security footage. We couldn't find any leads on the thief. After six months with no repeat attacks the investigation went cold."},
+  {s:null,t:"We did track the down the canisters. They were stolen from a laboratory ten miles away. There was no security footage. We couldn't find any leads on the thief. After six months with no repeat attacks the investigation went cold."},
   {s:null,t:"The Driscolls had been knocked out and abducted. Like I said, no one ever found the bodies. Who was to say they hadn't just run off?"},
   {s:null,t:"Until, well, I'd rather only talk about that once."},
   {s:"Interviewer",t:"What can you tell us about how the confession wound up with Miss Bamer?"},
@@ -182,6 +183,9 @@ const RAW=[
   {s:null,t:"It was an industrial building, as I stated. Approximately one hundred twenty feet long by maybe forty-five feet wide. It was a wooden structure and at first the condition seemed to match the neighboring buildings, however I noticed the facade had been recently patched in a few locations. Further investigation also revealed that the entrance had been chained and locked. My understanding was that it used to be a sheet metal shop. At least… excuse me, is there a garbage can?"},
   {s:null,t:"I might vomit."},
   {s:null,t:"Thank you."},
+  {s:null,t:"We."},
+  {s:null,t:"[Gagging]"},
+  {s:null,t:"Sorry."},
   {s:null,t:"I thought I was empty."},
   {s:null,t:"No, I want to get this done with. Then I'm going to want that sedative."},
   {s:null,t:"I could smell something from inside the building. Very faintly. I figured that would count as probable cause, not that I need it as a civilian, but you never forget the way a corpse smells."},
@@ -215,16 +219,18 @@ const RAW=[
   {s:null,t:"I wish he'd been a serial killer."},
   {s:"Interviewer",t:"Please take a moment."},
   {s:null,t:"After I… after I recovered my first thought was 'Thank God, they are all dead.'"},
+  {s:null,t:"[Gagging]"},
   {s:null,t:"I'm sixty-four years old for Christ's sake. I'm not a young man who can forget things anymore. When you're young you have this sense that you're invincible and that you're never going to die. I don't have that to protect me anymore."},
   {s:null,t:"Look at me whining, when they had that done to them."},
   {s:null,t:"It's my fault. I should have found them. Saved them, somehow."},
   {s:"Interviewer",t:"I'm sorry, Hob, I've got to ask. Can you describe the scene?"},
   {s:null,t:"Yeah-"},
+  {s:null,t:"[Gagging]"},
   {s:null,t:"I can."},
   {s:null,t:"I didn't know what I was looking at, at first. Hell, I still don't. It was… well, it was a stack. Maybe two feet thick. From the stink and coloring it was obviously made of flesh. I thought maybe he'd hacked them up and stacked them up in pieces. That would have been bad enough. The first thing that alerted me to the truth was the eyeball. On the top of the stack was a perfectly round eyeball in the middle of a socket that had been distorted to the size of a saucer. That's when I realized what I was looking at was…"},
   {s:null,t:"Twenty goddamn years of torture, basically."},
   {s:null,t:"He had the entire Driscoll family under those presses for twenty years, keeping them alive on an IV drip, increasing the pressure on them so very slowly that their bodies had time to adapt, until they'd been flattened like… well, like pancakes. He squished them by about a quarter inch every year for twenty years. Then he'd pulled them out when they were too broken and wretched to move, without any chance of recovery and stacked them on top of each other. I've got no idea what for. I don't want to know."},
-  {s:null,t:"And I was still thinking 'Thank God they're all dead' when the one on top started gasping again."},
+  {s:null,t:"And I was still thinking \"Thank God they're all dead\" when the one on top started gasping again."},
   {s:"Interviewer",t:"What did they say?"},
   {s:null,t:"Nothing at first. It couldn't speak without help. I think… it would have been Avery Driscoll. Not that I could tell much about the gender or the age. But the hair was blonde where there was hair. The head was a mess of scars. I think the son of a bitch who did this must have removed parts of their skulls. I've got no idea how he got their heads so flat, otherwise. Not as flat as the rest of the bodies but flat. Who the hell knows how their brains handled that. Their lips were punctured by teeth everywhere, after the presses had flattened out their noses, I guess."},
   {s:null,t:"Avery was fourteen when he disappeared."},
@@ -302,7 +308,13 @@ function buildText() {
       row.className = 'spk-row';
       const sp = document.createElement('span');
       sp.className = 'spk';
-      sp.textContent = b.s;
+      // 심문관 글자도 글자 단위로 분해해서 chars에 등록
+      [...b.s].forEach(ch => {
+        const sc = document.createElement('span');
+        sc.className = 'ch'; sc.textContent = ch;
+        sp.appendChild(sc);
+        chars.push({el:sc, op:1, gone:false});
+      });
       row.appendChild(sp);
       const p = document.createElement('p');
       p.className = 'para';
@@ -390,7 +402,7 @@ let faceMesh, cam;
 // 평활화 — 가중 이동평균
 const buf = [];
 // 모바일은 버퍼 작게(반응성↑), 데스크탑은 크게(안정성↑)
-const BUF_N = IS_MOBILE ? 5 : 8;
+const BUF_N = IS_MOBILE ? 3 : 5;
 
 function smooth(x, y) {
   buf.push({x, y});
@@ -430,7 +442,7 @@ function mapGaze(rx, ry) {
 
 function initFaceMesh() {
   faceMesh = new FaceMesh({locateFile: f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`});
-  faceMesh.setOptions({maxNumFaces:1, refineLandmarks:true, minDetectionConfidence:.5, minTrackingConfidence:.5});
+  faceMesh.setOptions({maxNumFaces:1, refineLandmarks:true, minDetectionConfidence:.4, minTrackingConfidence:.4});
   faceMesh.onResults(res => {
     if (!res.multiFaceLandmarks?.[0]) return;
     const lm = res.multiFaceLandmarks[0];
