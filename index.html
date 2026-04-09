@@ -377,7 +377,8 @@ function startReader(mouseMode) {
     document.addEventListener('mousemove', e => moveGazeDot(e.clientX, e.clientY));
   } else {
     sbarL.textContent = 'Eye tracking active';
-    // dotEl은 이미 보정 화면에서 visibility:visible 상태
+    dotEl.style.background = 'rgba(200,75,30,.8)';
+    dotEl.style.visibility = 'visible';
   }
   buildText();
   requestAnimationFrame(tick);
@@ -507,9 +508,7 @@ document.getElementById('btn-start').addEventListener('click', ()=>{
       stream.getTracks().forEach(t=>t.stop());
       document.getElementById('scr-start').style.display = 'none';
       document.getElementById('scr-cal').style.display   = 'block';
-      // 시선 점 즉시 표시 (보정 화면에서도)
-      dotEl.style.background  = 'rgba(200,75,30,.8)';
-      dotEl.style.visibility  = 'visible';
+      // dotEl은 보정 완료 후 startReader에서 표시
       initFaceMesh();
       setupCalDots();
       startCam();
