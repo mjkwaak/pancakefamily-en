@@ -392,7 +392,7 @@ const buf = [];
 const BUF_N = 5; // 데스크탑용 버퍼
 // EMA 상태 (모바일용)
 let emaX = -1, emaY = -1;
-const EMA_ALPHA = IS_MOBILE ? 0.05 : 1; // 낮을수록 부드러움
+const EMA_ALPHA = IS_MOBILE ? 0.15 : 1; // 낮을수록 부드러움
 
 function smooth(x, y) {
   if (IS_MOBILE) {
@@ -439,28 +439,40 @@ function mapGaze(rx, ry) {
 
 function initFaceMesh() {
   faceMesh = new FaceMesh({locateFile: f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`});
-  faceMesh.setOptions({maxNumFaces:1, refineLandmarks:true, minDetectionConfidence:.3, minTrackingConfidence:.3});
+  faceMesh.setOptions({maxNumFaces:1, refineLandmarks:!IS_MOBILE, minDetectionConfidence:.3, minTrackingConfidence:.3});
   faceMesh.onResults(res => {
     if (!res.multiFaceLandmarks?.[0]) return;
     const lm = res.multiFaceLandmarks[0];
-    const lI = lm[473], rI = lm[468];
-    if (!lI || !rI) return;
-    // 깜빡임 감지 — 눈 개방도 측정
+
+    // 깜빡임 감지
     const lT=lm[159],lB=lm[145],rT=lm[386],rB=lm[374];
     if (lT&&lB&&rT&&rB) {
       const lOpen = Math.abs(lB.y - lT.y);
       const rOpen = Math.abs(rB.y - rT.y);
-      const avgOpen = (lOpen + rOpen) / 2;
-      if (avgOpen < BLINK_THRESH) {
+      if ((lOpen+rOpen)/2 < BLINK_THRESH) {
         blinkCooldown = BLINK_SUPPRESS;
         return;
       }
     }
     if (blinkCooldown > 0) { blinkCooldown--; return; }
 
-    // iris 평균 → 미러 반전
-    const rx = 1-(lI.x+rI.x)/2;
-    const ry = (lI.y+rI.y)/2;
+    let rx, ry;
+    if (IS_MOBILE) {
+      // 모바일: refineLandmarks 꺼져있으므로 눈 코너 중심점 사용
+      const lInner=lm[133], lOuter=lm[33];
+      const rInner=lm[362], rOuter=lm[263];
+      const lTop=lm[159], lBot=lm[145];
+      const rTop=lm[386], rBot=lm[374];
+      if (!lInner||!lOuter||!rInner||!rOuter) return;
+      rx = 1-((lInner.x+lOuter.x)/2 + (rInner.x+rOuter.x)/2)/2;
+      ry = ((lTop.y+lBot.y)/2 + (rTop.y+rBot.y)/2)/2;
+    } else {
+      // PC: iris 랜드마크 사용
+      const lI = lm[473], rI = lm[468];
+      if (!lI || !rI) return;
+      rx = 1-(lI.x+rI.x)/2;
+      ry = (lI.y+rI.y)/2;
+    }
 
     lastRaw = {x:rx, y:ry};
     const sm = smooth(rx, ry);
@@ -478,7 +490,7 @@ function startCam() {
       // 모바일: 3프레임마다 1번만 처리
       if (IS_MOBILE) {
         frameCount++;
-        if (frameCount % 3 !== 0) return;
+        if (frameCount % 2 !== 0) return;
       }
       await faceMesh.send({image:v});
     },
