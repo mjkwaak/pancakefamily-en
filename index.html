@@ -476,17 +476,10 @@ function setupCalDots() {
     d.style.left = sx+'px'; d.style.top = sy+'px';
     d.addEventListener('click', ()=>{
       if (i!==calIdx) return;
-      // 보정 포인트: EMA값(모바일) 또는 버퍼 평균(데스크탑)
-      let avgRX, avgRY;
-      if (IS_MOBILE) {
-        avgRX = emaX > 0 ? emaX : lastRaw.x;
-        avgRY = emaY > 0 ? emaY : lastRaw.y;
-      } else {
-        const n = Math.min(buf.length,5);
-        const sl = buf.slice(-n);
-        avgRX = sl.reduce((a,p)=>a+p.x,0)/n || lastRaw.x;
-        avgRY = sl.reduce((a,p)=>a+p.y,0)/n || lastRaw.y;
-      }
+      // 보정 포인트: 최근 smoothBuf 평균 또는 lastRaw
+      const calN = Math.min(smoothBuf.length, 5);
+      const avgRX = calN > 0 ? smoothBuf.slice(-calN).reduce((a,p)=>a+p.x,0)/calN : lastRaw.x;
+      const avgRY = calN > 0 ? smoothBuf.slice(-calN).reduce((a,p)=>a+p.y,0)/calN : lastRaw.y;
       cal.push({
         rx:avgRX, ry:avgRY, sx, sy,
         rx_ratio: sx / window.innerWidth,   // 창 비율 저장
