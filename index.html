@@ -377,7 +377,7 @@ function startReader(mouseMode) {
 /* ── FaceMesh ── */
 let faceMesh, cam;
 const smoothBuf = [];
-const SMOOTH_N  = IS_MOBILE ? 3 : 6;
+const SMOOTH_N  = IS_MOBILE ? 3 : 12;
 let blinkCooldown = 0;
 const cal = [];
 let lastRaw = {x:.5, y:.5};
@@ -393,19 +393,31 @@ function smoothGaze(x, y) {
 
 function mapGaze(rx, ry) {
   const W = window.innerWidth, H = window.innerHeight;
-  if (cal.length < 2) return {x: rx*W, y: ry*H};
-  const rxs=cal.map(p=>p.rx), rys=cal.map(p=>p.ry);
-  const sxs=cal.map(p=>p.sx), sys=cal.map(p=>p.sy);
-  const minRX=Math.min(...rxs), maxRX=Math.max(...rxs);
-  const minRY=Math.min(...rys), maxRY=Math.max(...rys);
-  const minSX=Math.min(...sxs), maxSX=Math.max(...sxs);
-  const minSY=Math.min(...sys), maxSY=Math.max(...sys);
-  const rngRX=maxRX-minRX, rngRY=maxRY-minRY;
-  if (rngRX<0.003||rngRY<0.003) return {x:rx*W, y:ry*H};
-  const t=(rx-minRX)/rngRX, u=(ry-minRY)/rngRY;
+  if (cal.length < 4) return {x: rx*W, y: ry*H};
+  // 최소자승법으로 선형 매핑 계산 (ax*rx + bx = sx)
+  const n = cal.length;
+  let sumRX=0,sumRY=0,sumSX=0,sumSY=0;
+  let sumRX2=0,sumRY2=0,sumRXSX=0,sumRYSY=0;
+  cal.forEach(p=>{
+    sumRX+=p.rx; sumRY+=p.ry;
+    sumSX+=p.sx; sumSY+=p.sy;
+    sumRX2+=p.rx*p.rx; sumRY2+=p.ry*p.ry;
+    sumRXSX+=p.rx*p.sx; sumRYSY+=p.ry*p.sy;
+  });
+  const denX = n*sumRX2 - sumRX*sumRX;
+  const denY = n*sumRY2 - sumRY*sumRY;
+  // 분모가 너무 작으면 (보정 점들이 한 방향으로 쏠림) 단순 비례 사용
+  if (Math.abs(denX)<1e-6 || Math.abs(denY)<1e-6) return {x:rx*W, y:ry*H};
+  const ax = (n*sumRXSX - sumRX*sumSX)/denX;
+  const bx = (sumSX - ax*sumRX)/n;
+  const ay = (n*sumRYSY - sumRY*sumSY)/denY;
+  const by = (sumSY - ay*sumRY)/n;
+  const mx = ax*rx+bx, my = ay*ry+by;
+  // 결과가 화면 밖으로 크게 튀면 lastRaw 비례값으로 대체
+  if (mx<-W||mx>W*2||my<-H||my>H*2) return {x:rx*W, y:ry*H};
   return {
-    x: Math.max(0,Math.min(W, minSX+t*(maxSX-minSX))),
-    y: Math.max(0,Math.min(H, minSY+u*(maxSY-minSY))),
+    x: Math.max(0,Math.min(W, mx)),
+    y: Math.max(0,Math.min(H, my)),
   };
 }
 
@@ -510,6 +522,7 @@ document.getElementById('btn-start').addEventListener('click', ()=>{
       stream.getTracks().forEach(t=>t.stop());
       document.getElementById('scr-start').style.display = 'none';
       document.getElementById('scr-cal').style.display   = 'block';
+      dotEl.style.visibility = 'visible';
       initFaceMesh();
       setupCalDots();
       startCam();
