@@ -387,53 +387,16 @@ function startReader(mouseMode) {
    MediaPipe FaceMesh
 ══════════════════════════════════════════ */
 let faceMesh, cam;
-// 평활화 — 가중 이동평균
-const buf = [];
-const BUF_N = 5; // 데스크탑용 버퍼
-// EMA 상태 (모바일용)
-let emaX = -1, emaY = -1;
-const EMA_ALPHA = IS_MOBILE ? 0.07 : 1; // 낮을수록 부드러움
+// 평활화 버퍼
+const smoothBuf = [];
+const SMOOTH_N  = IS_MOBILE ? 4 : 6;
 
-function smooth(x, y) {
-  if (IS_MOBILE) {
-    // 지수 이동 평균 — 튐 없이 부드럽게 추종
-    if (emaX < 0) { emaX = x; emaY = y; }
-    emaX = emaX + EMA_ALPHA * (x - emaX);
-    emaY = emaY + EMA_ALPHA * (y - emaY);
-    return {x: emaX, y: emaY};
-  }
-  // 데스크탑 — 선형 가중 이동평균
-  buf.push({x, y});
-  if (buf.length > BUF_N) buf.shift();
-  let wx=0, wy=0, ws=0;
-  buf.forEach((p,i) => { const w = i + 1; wx+=p.x*w; wy+=p.y*w; ws+=w; });
-  return {x: wx/ws, y: wy/ws};
-}
-
-// 깜빡임 억제 — 깜빡임 감지 후 N프레임 동안 좌표 고정
-let blinkCooldown = 0;      // 남은 억제 프레임 수
-const BLINK_SUPPRESS = IS_MOBILE ? 7 : 6;
-const BLINK_THRESH   = IS_MOBILE ? 0.02 : 0.018;
-
-// 보정 데이터
-const cal = [];   // {rx, ry, sx, sy}
-let lastRaw = {x:.5, y:.5};
-
-function mapGaze(rx, ry) {
-  const W = window.innerWidth, H = window.innerHeight;
-  if (cal.length < 2) return {x: rx*W, y: ry*H};
-  const rxs = cal.map(p=>p.rx), rys = cal.map(p=>p.ry);
-  const sxs = cal.map(p=>p.sx), sys = cal.map(p=>p.sy);
-  const minRX=Math.min(...rxs), maxRX=Math.max(...rxs);
-  const minRY=Math.min(...rys), maxRY=Math.max(...rys);
-  const minSX=Math.min(...sxs), maxSX=Math.max(...sxs);
-  const minSY=Math.min(...sys), maxSY=Math.max(...sys);
-  const rngRX = maxRX-minRX, rngRY = maxRY-minRY;
-  if (rngRX < 0.003 || rngRY < 0.003) return {x: rx*W, y: ry*H};
-  const t = (rx-minRX)/rngRX, u = (ry-minRY)/rngRY;
+function smoothGaze(x, y) {
+  smoothBuf.push({x, y});
+  if (smoothBuf.length > SMOOTH_N) smoothBuf.shift();
   return {
-    x: Math.max(0, Math.min(W, minSX + t*(maxSX-minSX))),
-    y: Math.max(0, Math.min(H, minSY + u*(maxSY-minSY))),
+    x: smoothBuf.reduce((a,p)=>a+p.x,0)/smoothBuf.length,
+    y: smoothBuf.reduce((a,p)=>a+p.y,0)/smoothBuf.length,
   };
 }
 
@@ -458,9 +421,8 @@ function initFaceMesh() {
     if (blinkCooldown > 0) { blinkCooldown--; return; }
     const rx = 1-(lI.x+rI.x)/2;
     const ry = (lI.y+rI.y)/2;
-
     lastRaw = {x:rx, y:ry};
-    const sm = smooth(rx, ry);
+    const sm = smoothGaze(rx, ry);
     const mp = mapGaze(sm.x, sm.y);
     moveGazeDot(mp.x, mp.y);
   });
@@ -470,9 +432,7 @@ function startCam() {
   const v = document.getElementById('vid');
   v.style.display = 'block';
   cam = new Camera(v, {
-    onFrame: async () => {
-      await faceMesh.send({image:v});
-    },
+    onFrame: async () => { await faceMesh.send({image:v}); },
     width: IS_MOBILE ? 320 : 640, height: IS_MOBILE ? 240 : 480,
   });
   cam.start();
