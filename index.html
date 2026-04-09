@@ -472,15 +472,22 @@ function initFaceMesh() {
 function startCam() {
   const v = document.getElementById('vid');
   v.style.display = 'block';
+  let processing = false;  // 처리 중 플래그
   let frameCount = 0;
   cam = new Camera(v, {
     onFrame: async () => {
-      // 모바일: 2프레임마다 1번 처리 (CPU 부하 절반)
+      // 이전 프레임 처리 중이면 스킵 — 큐 쌓임 방지
+      if (processing) return;
       if (IS_MOBILE) {
         frameCount++;
         if (frameCount % 2 !== 0) return;
       }
-      await faceMesh.send({image:v});
+      processing = true;
+      try {
+        await faceMesh.send({image:v});
+      } finally {
+        processing = false;
+      }
     },
     width: IS_MOBILE ? 320 : 640, height: IS_MOBILE ? 240 : 480,
   });
