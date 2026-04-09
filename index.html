@@ -279,7 +279,7 @@ function moveGazeDot(x, y) {
   gx = x; gy = y;
   dotEl.style.left = x + 'px';
   dotEl.style.top  = y + 'px';
-  dotEl.style.visibility = 'visible';
+  if (dotEl.style.visibility !== 'visible') dotEl.style.visibility = 'visible';
 }
 
 /* ── 글자 렌더링 ── */
@@ -377,7 +377,7 @@ function startReader(mouseMode) {
 /* ── FaceMesh ── */
 let faceMesh, cam;
 const smoothBuf = [];
-const SMOOTH_N  = IS_MOBILE ? 3 : 10;
+const SMOOTH_N  = IS_MOBILE ? 3 : 6;
 let blinkCooldown = 0;
 const cal = [];
 let lastRaw = {x:.5, y:.5};
@@ -435,17 +435,14 @@ function initFaceMesh() {
 function startCam() {
   const v = document.getElementById('vid');
   v.style.display = 'block';
-  let busy = false;
+  let skip = 0;
   cam = new Camera(v, {
     onFrame: async () => {
       if (IS_MOBILE) {
-        if (busy) return;
-        busy = true;
-        try { await faceMesh.send({image:v}); }
-        finally { busy = false; }
-      } else {
-        await faceMesh.send({image:v});
+        skip++;
+        if (skip % 2 !== 0) return;
       }
+      await faceMesh.send({image:v});
     },
     width: IS_MOBILE ? 320 : 640, height: IS_MOBILE ? 240 : 480,
   });
