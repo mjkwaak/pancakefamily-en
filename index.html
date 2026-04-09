@@ -7,8 +7,9 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>Pancake Family</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min-height:100vh;overflow-x:hidden}
 
@@ -47,12 +48,12 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 #scr-done .big{font-size:13px;color:#444}
 
 
-@media(max-width:600px){#scr-start{align-items:center;justify-content:center;padding:40px 20px}#scr-start .title{align-items:center;text-align:center}#btn-mouse{display:none}#reader{padding:20vh 16px 90px 16px}#txt{display:grid;grid-template-columns:70px 257px;column-gap:16px}.spk-row{display:contents}.spk{font-family:"psfournier-std",sans-serif;font-size:15px;font-weight:300;color:#555;line-height:1.5;padding-top:0;grid-column:1;align-self:start}.spk-row .para{grid-column:2;margin:0}.para.no-spk{grid-column:2;padding-left:0;margin-bottom:1.4em}.para{margin-bottom:1.4em;max-width:none}}</style>
+@media(max-width:600px){#scr-start{align-items:center;justify-content:center;padding:40px 20px}#scr-start .title{align-items:center;text-align:center}#btn-mouse{display:none}#reader{padding:20vh 16px 90px 16px}#txt{display:grid;grid-template-columns:70px 257px;column-gap:16px}.spk-row{display:contents}.spk{font-family:"psfournier-std",sans-serif;font-size:15px;font-weight:300;color:#555;line-height:1.5;padding-top:0;grid-column:1;align-self:start}.spk-row .para{grid-column:2;margin:0}.para.no-spk{grid-column:2;padding-left:0;margin-bottom:1.4em}.para{margin-bottom:1.4em;max-width:none}}
+</style>
 <link rel="stylesheet" href="https://use.typekit.net/azt6kde.css">
 </head>
 <body>
 
-<!-- 시작 -->
 <div id="scr-start">
   <div class="title"><span>The</span><span>Pancake</span><span>Family</span></div>
   <p class="warn">⚠ Camera access required</p>
@@ -60,7 +61,6 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
   <span class="lnk" id="btn-mouse">Try with mouse instead</span>
 </div>
 
-<!-- 보정 -->
 <div id="scr-cal">
   <div id="cal-label">Gaze at each red dot and click in order</div>
 </div>
@@ -84,8 +84,6 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 <script>
 'use strict';
 
-
-/* ── 텍스트 데이터 ── */
 const RAW=[
   {s:null,t:"That pale, huh? Jesus, I bet I look like a ghost. I feel like I've bled out two gallons."},
   {s:null,t:"What? No. Not a scratch."},
@@ -261,24 +259,22 @@ const RAW=[
   {s:"Interviewer",t:"Are you sure? There is no one by the last name of Bamer on staff with the Daily World."},
 ];
 
-/* ══════════════════════════════════════════
-   핵심 상태
-══════════════════════════════════════════ */
-const dotEl  = document.getElementById('dot');   // 시선 점 — 항상 DOM에 존재
+/* ── 전역 ── */
+const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+const RADIUS = IS_MOBILE ? 30 : 40;
+const FADE   = 0.2;
+const BLINK_SUPPRESS = IS_MOBILE ? 7 : 6;
+const BLINK_THRESH   = IS_MOBILE ? 0.02 : 0.018;
+
+const dotEl  = document.getElementById('dot');
 const barEl  = document.getElementById('bar');
 const sbarR  = document.getElementById('sbar-r');
 const sbarL  = document.getElementById('sbar-l');
 
-let gx = -999, gy = -999;   // 현재 시선 화면 좌표
+let gx = -999, gy = -999;
 let chars = [], total = 0;
-// 모바일/데스크탑 분기
-const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+let rafId;
 
-const RADIUS = IS_MOBILE ? 30 : 40;   // 모바일은 반경 약간 크게
-const FADE   = IS_MOBILE ? 0.2 : 0.2; // 모바일은 소멸 약간 빠르게
-let rafId, lastTs = 0;
-
-/* ── 시선 점 이동 (단일 함수로 통합) ── */
 function moveGazeDot(x, y) {
   gx = x; gy = y;
   dotEl.style.left = x + 'px';
@@ -296,7 +292,6 @@ function buildText() {
       row.className = 'spk-row';
       const sp = document.createElement('span');
       sp.className = 'spk';
-      // 심문관 글자도 글자 단위로 분해해서 chars에 등록
       [...b.s].forEach(ch => {
         const sc = document.createElement('span');
         sc.className = 'ch'; sc.textContent = ch;
@@ -317,7 +312,7 @@ function buildText() {
       c.appendChild(row);
     } else {
       const p = document.createElement('p');
-      p.className = 'para';
+      p.className = 'para no-spk';
       [...b.t].forEach(ch => {
         const s = document.createElement('span');
         s.className = 'ch'; s.textContent = ch;
@@ -325,7 +320,6 @@ function buildText() {
         chars.push({el:s, op:1, gone:false});
       });
       p.appendChild(document.createTextNode(' '));
-      p.className = 'para no-spk';
       c.appendChild(p);
     }
   });
@@ -333,15 +327,13 @@ function buildText() {
 }
 
 /* ── 프레임 루프 ── */
-function tick(ts) {
+function tick() {
   rafId = requestAnimationFrame(tick);
-  // FPS 캡 제거 — rAF가 디스플레이 주사율에 자동 동기화
-  // 글자 소멸 연산만 담당 (시선 좌표는 FaceMesh onResults에서 별도 업데이트)
   let dirty = false;
   chars.forEach(c => {
     if (c.gone) return;
     const r  = c.el.getBoundingClientRect();
-    const cx = (r.left + r.right)  * .5;
+    const cx = (r.left + r.right) * .5;
     const cy = (r.top  + r.bottom) * .5;
     if (Math.hypot(cx - gx, cy - gy) < RADIUS) {
       c.op = Math.max(0, c.op - FADE);
@@ -354,7 +346,7 @@ function tick(ts) {
     const gone = chars.filter(c=>c.gone).length;
     const pct  = Math.round(gone/total*100);
     barEl.style.width = pct + '%';
-    sbarR.textContent = pct + '% erased';
+    sbarR.textContent = pct + '%% erased';
     if (gone === total) {
       document.getElementById('scr-done').style.display = 'flex';
       cancelAnimationFrame(rafId);
@@ -368,15 +360,13 @@ function startReader(mouseMode) {
   document.getElementById('scr-cal').style.display   = 'none';
   document.getElementById('reader').style.display    = 'block';
   document.getElementById('sbar').style.display      = 'flex';
-
   if (mouseMode) {
-    
     sbarL.textContent = 'Mouse mode';
     dotEl.style.background = 'rgba(120,160,255,.7)';
     dotEl.style.visibility = 'visible';
     document.addEventListener('mousemove', e => moveGazeDot(e.clientX, e.clientY));
   } else {
-    sbarL.textContent = 'Eye tracking active';
+    sbarL.textContent = 'Eye tracking';
     dotEl.style.background = 'rgba(200,75,30,.8)';
     dotEl.style.visibility = 'visible';
   }
@@ -384,13 +374,13 @@ function startReader(mouseMode) {
   requestAnimationFrame(tick);
 }
 
-/* ══════════════════════════════════════════
-   MediaPipe FaceMesh
-══════════════════════════════════════════ */
+/* ── FaceMesh ── */
 let faceMesh, cam;
-// 평활화 버퍼
 const smoothBuf = [];
 const SMOOTH_N  = IS_MOBILE ? 4 : 6;
+let blinkCooldown = 0;
+const cal = [];
+let lastRaw = {x:.5, y:.5};
 
 function smoothGaze(x, y) {
   smoothBuf.push({x, y});
@@ -401,27 +391,40 @@ function smoothGaze(x, y) {
   };
 }
 
+function mapGaze(rx, ry) {
+  const W = window.innerWidth, H = window.innerHeight;
+  if (cal.length < 2) return {x: rx*W, y: ry*H};
+  const rxs=cal.map(p=>p.rx), rys=cal.map(p=>p.ry);
+  const sxs=cal.map(p=>p.sx), sys=cal.map(p=>p.sy);
+  const minRX=Math.min(...rxs), maxRX=Math.max(...rxs);
+  const minRY=Math.min(...rys), maxRY=Math.max(...rys);
+  const minSX=Math.min(...sxs), maxSX=Math.max(...sxs);
+  const minSY=Math.min(...sys), maxSY=Math.max(...sys);
+  const rngRX=maxRX-minRX, rngRY=maxRY-minRY;
+  if (rngRX<0.003||rngRY<0.003) return {x:rx*W, y:ry*H};
+  const t=(rx-minRX)/rngRX, u=(ry-minRY)/rngRY;
+  return {
+    x: Math.max(0,Math.min(W, minSX+t*(maxSX-minSX))),
+    y: Math.max(0,Math.min(H, minSY+u*(maxSY-minSY))),
+  };
+}
+
 function initFaceMesh() {
   faceMesh = new FaceMesh({locateFile: f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`});
   faceMesh.setOptions({maxNumFaces:1, refineLandmarks:true, minDetectionConfidence:.5, minTrackingConfidence:.5});
   faceMesh.onResults(res => {
     if (!res.multiFaceLandmarks?.[0]) return;
     const lm = res.multiFaceLandmarks[0];
-    const lI = lm[473], rI = lm[468];
-    if (!lI || !rI) return;
-    // 깜빡임 감지
+    const lI=lm[473], rI=lm[468];
+    if (!lI||!rI) return;
     const lT=lm[159],lB=lm[145],rT=lm[386],rB=lm[374];
     if (lT&&lB&&rT&&rB) {
-      const lOpen = Math.abs(lB.y - lT.y);
-      const rOpen = Math.abs(rB.y - rT.y);
-      if ((lOpen+rOpen)/2 < BLINK_THRESH) {
-        blinkCooldown = BLINK_SUPPRESS;
-        return;
+      if ((Math.abs(lB.y-lT.y)+Math.abs(rB.y-rT.y))/2 < BLINK_THRESH) {
+        blinkCooldown = BLINK_SUPPRESS; return;
       }
     }
-    if (blinkCooldown > 0) { blinkCooldown--; return; }
-    const rx = 1-(lI.x+rI.x)/2;
-    const ry = (lI.y+rI.y)/2;
+    if (blinkCooldown>0) { blinkCooldown--; return; }
+    const rx=1-(lI.x+rI.x)/2, ry=(lI.y+rI.y)/2;
     lastRaw = {x:rx, y:ry};
     const sm = smoothGaze(rx, ry);
     const mp = mapGaze(sm.x, sm.y);
@@ -439,53 +442,43 @@ function startCam() {
   cam.start();
 }
 
-/* ══════════════════════════════════════════
-   보정 점 UI
-══════════════════════════════════════════ */
+/* ── 보정 점 ── */
 function calPositions() {
   const W=window.innerWidth, H=window.innerHeight;
-  const vvp = window.visualViewport;
-  const safeB = vvp ? Math.max(0, H-(vvp.height+vvp.offsetTop)) : 0;
-  const pad = safeB + 44;
+  const vvp=window.visualViewport;
+  const safeB=vvp?Math.max(0,H-(vvp.height+vvp.offsetTop)):0;
+  const pad=safeB+44;
   return [
-    [W*.1, H*.08],[W*.5, H*.08],[W*.9, H*.08],
-    [W*.1, H*.50],[W*.5, H*.50],[W*.9, H*.50],
-    [W*.1, H-pad],[W*.5, H-pad],[W*.9, H-pad],
+    [W*.1,H*.08],[W*.5,H*.08],[W*.9,H*.08],
+    [W*.1,H*.50],[W*.5,H*.50],[W*.9,H*.50],
+    [W*.1,H-pad],[W*.5,H-pad],[W*.9,H-pad],
   ];
 }
 
-// 창 크기 변경 시 보정 데이터 비율 재계산
-window.addEventListener('resize', () => {
-  if (cal.length === 0) return;
-  const W = window.innerWidth, H = window.innerHeight;
-  cal.forEach(p => {
-    // 저장된 비율로 sx/sy 재계산
-    if (p.rx_ratio !== undefined) {
-      p.sx = p.rx_ratio * W;
-      p.sy = p.ry_ratio * H;
-    }
+window.addEventListener('resize', ()=>{
+  if (!cal.length) return;
+  const W=window.innerWidth, H=window.innerHeight;
+  cal.forEach(p=>{
+    if (p.rx_ratio!==undefined) { p.sx=p.rx_ratio*W; p.sy=p.ry_ratio*H; }
   });
 });
 
 let calIdx=0, calDots=[];
 function setupCalDots() {
-  const scr = document.getElementById('scr-cal');
-  const pos = calPositions();
+  const scr=document.getElementById('scr-cal');
+  const pos=calPositions();
   pos.forEach(([sx,sy],i) => {
-    const d = document.createElement('div');
-    d.className = 'cdot' + (i>0?' off':'');
-    d.style.left = sx+'px'; d.style.top = sy+'px';
-    d.addEventListener('click', ()=>{
+    const d=document.createElement('div');
+    d.className='cdot'+(i>0?' off':'');
+    d.style.left=sx+'px'; d.style.top=sy+'px';
+    const onTap=(e)=>{
+      if (e && e.cancelable) e.preventDefault();
       if (i!==calIdx) return;
-      // 보정 포인트: 최근 smoothBuf 평균 또는 lastRaw
-      const calN = Math.min(smoothBuf.length, 5);
-      const avgRX = calN > 0 ? smoothBuf.slice(-calN).reduce((a,p)=>a+p.x,0)/calN : lastRaw.x;
-      const avgRY = calN > 0 ? smoothBuf.slice(-calN).reduce((a,p)=>a+p.y,0)/calN : lastRaw.y;
-      cal.push({
-        rx:avgRX, ry:avgRY, sx, sy,
-        rx_ratio: sx / window.innerWidth,   // 창 비율 저장
-        ry_ratio: sy / window.innerHeight,
-      });
+      const n=Math.min(smoothBuf.length,5);
+      const avgRX=n>0?smoothBuf.slice(-n).reduce((a,p)=>a+p.x,0)/n:lastRaw.x;
+      const avgRY=n>0?smoothBuf.slice(-n).reduce((a,p)=>a+p.y,0)/n:lastRaw.y;
+      cal.push({rx:avgRX,ry:avgRY,sx,sy,
+        rx_ratio:sx/window.innerWidth,ry_ratio:sy/window.innerHeight});
       d.classList.add('done');
       calIdx++;
       if (calIdx<pos.length) {
@@ -493,22 +486,21 @@ function setupCalDots() {
       } else {
         startReader(false);
       }
-    });
+    };
+    d.addEventListener('click', onTap);
+    d.addEventListener('touchend', onTap, {passive:false});
     scr.appendChild(d);
     calDots.push(d);
   });
 }
 
-/* ══════════════════════════════════════════
-   버튼
-══════════════════════════════════════════ */
+/* ── 버튼 ── */
 document.getElementById('btn-start').addEventListener('click', ()=>{
   navigator.mediaDevices.getUserMedia({video:true})
     .then(stream => {
       stream.getTracks().forEach(t=>t.stop());
       document.getElementById('scr-start').style.display = 'none';
       document.getElementById('scr-cal').style.display   = 'block';
-      // dotEl은 보정 완료 후 startReader에서 표시
       initFaceMesh();
       setupCalDots();
       startCam();
@@ -523,7 +515,6 @@ document.getElementById('btn-mouse').addEventListener('click', ()=>{
   document.getElementById('scr-start').style.display = 'none';
   startReader(true);
 });
-
 </script>
 </body>
 </html>
