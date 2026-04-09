@@ -482,20 +482,22 @@ function setupCalDots() {
     d.className='cdot'+(i>0?' off':'');
     d.style.left=sx+'px'; d.style.top=sy+'px';
     const onTap=(e)=>{
-      if (e && e.cancelable) e.preventDefault();
-      if (i!==calIdx) return;
-      const n=Math.min(smoothBuf.length,5);
-      const avgRX=n>0?smoothBuf.slice(-n).reduce((a,p)=>a+p.x,0)/n:lastRaw.x;
-      const avgRY=n>0?smoothBuf.slice(-n).reduce((a,p)=>a+p.y,0)/n:lastRaw.y;
-      cal.push({rx:avgRX,ry:avgRY,sx,sy,
-        rx_ratio:sx/window.innerWidth,ry_ratio:sy/window.innerHeight});
-      d.classList.add('done');
-      calIdx++;
-      if (calIdx<pos.length) {
-        calDots[calIdx].classList.remove('off');
-      } else {
-        startReader(false);
-      }
+      try {
+        if (e && e.cancelable) e.preventDefault();
+        if (i!==calIdx) return;
+        // lastRaw 우선 사용 (smoothBuf 비어있어도 안전)
+        const avgRX = lastRaw.x;
+        const avgRY = lastRaw.y;
+        cal.push({rx:avgRX,ry:avgRY,sx,sy,
+          rx_ratio:sx/window.innerWidth,ry_ratio:sy/window.innerHeight});
+        d.classList.add('done');
+        calIdx++;
+        if (calIdx<pos.length) {
+          calDots[calIdx].classList.remove('off');
+        } else {
+          startReader(false);
+        }
+      } catch(err) { console.error('calTap error:', err); }
     };
     d.addEventListener('click', onTap);
     d.addEventListener('touchend', onTap, {passive:false});
