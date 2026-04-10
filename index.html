@@ -13,31 +13,9 @@
 html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min-height:100vh;overflow-x:hidden}
 
 /* ── 표지 ── */
-#scr-start{
-  position:fixed;inset:0;background:#000;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  align-items:start;
-  padding:40px 48px;
-  z-index:100;
-}
-#scr-start .title{
-  font-family:'adobe-myungjo-std',serif;font-size:28px;
-  font-weight:300;color:#fff;
-  display:flex;flex-direction:column;
-  line-height:1.15;letter-spacing:0.01em;
-  pointer-events:none;
-  grid-column:1;
-}
-.btn{
-  background:transparent;border:none;color:#888;
-  font-family:'adobe-myungjo-std',serif;
-  font-size:18px;letter-spacing:0.1em;cursor:pointer;
-  transition:color .3s;
-  justify-self:end;
-  grid-column:2;
-  padding:0;
-}
+#scr-start{position:fixed;inset:0;background:#000;display:flex;align-items:flex-start;padding:40px 48px;z-index:100;}
+#scr-start .title{font-family:'adobe-myungjo-std',serif;font-size:28px;color:#fff;display:flex;flex-direction:column;line-height:1.15;letter-spacing:0.01em;pointer-events:none;}
+.btn{background:transparent;border:none;color:#888;font-family:'adobe-myungjo-std',serif;font-size:28px;letter-spacing:0.05em;cursor:pointer;transition:color .3s;position:fixed;top:40px;left:55%;padding:0;}
 .btn:hover{color:#fff}
 
 /* ── 보정 화면 ── */
@@ -77,7 +55,7 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 #reader-title{
   position:fixed;top:40px;left:48px;
   font-family:'adobe-myungjo-std',serif;font-size:28px;
-  font-weight:300;color:#fff;
+  color:#fff;
   display:flex;flex-direction:column;
   line-height:1.15;letter-spacing:0.01em;
   pointer-events:none;z-index:10;
@@ -109,7 +87,7 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 #scr-done p{font-family:'IBM Plex Mono',monospace;font-size:11px;
   color:#555;letter-spacing:0.2em;text-align:center;line-height:2}
 #scr-done .big{font-size:13px;color:#444}
-@media(max-width:600px){#scr-start{display:grid;grid-template-columns:1fr 1fr;align-items:start;padding:20px 20px;gap:0}#scr-start .title{font-size:22px;line-height:1.15}.btn{font-size:16px}#reader{padding:0}#reader-title{top:20px;left:20px;font-size:22px;}#txt-wrap{top:20px;right:20px;width:calc(50% - 20px);bottom:40px}.para{font-size:13px;line-height:1.6;margin-bottom:1.4em}.spk-row{grid-template-columns:56px 1fr;column-gap:10px;margin-bottom:1.4em}.spk{font-size:13px}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{padding-left:66px}}</style>
+@media(max-width:600px){#scr-start{position:fixed;inset:0;background:#000;display:flex;align-items:flex-start;padding:20px 20px;z-index:100}#scr-start .title{font-size:22px;line-height:1.15}.btn{position:fixed;top:20px;left:50%;font-size:22px;padding:0}#reader-title{top:20px;left:20px;font-size:22px}#txt-wrap{top:20px;right:0;width:50%;padding-right:20px;bottom:40px}.para{font-size:13px;line-height:1.6;margin-bottom:1.4em}.spk-row{grid-template-columns:56px 1fr;column-gap:10px;margin-bottom:1.4em}.spk{font-size:13px}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{padding-left:66px}}</style>
 <link rel="stylesheet" href="https://use.typekit.net/azt6kde.css">
 </head>
 <body>
