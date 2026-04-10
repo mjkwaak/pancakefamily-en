@@ -16,13 +16,13 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 #scr-start{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2rem;z-index:100;padding:80px 40px 40px}
 #scr-start .title{font-family:"neue-haas-grotesk-display",sans-serif;font-size:28px;letter-spacing:0.01em;font-weight:300;color:#fff;display:flex;flex-direction:column;align-items:center;line-height:0.9;text-align:center;pointer-events:none}
 #scr-start .warn{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#c84b1e;letter-spacing:0.08em;text-align:center}
-.btn{background:transparent;border:1px solid #333;color:#888;padding:13px 40px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.25em;cursor:pointer;text-transform:uppercase;transition:border-color .3s,color .3s}
+.btn{background:transparent;border:1px solid #333;color:#888;padding:13px 40px;font-family:'neue-haas-grotesk-display',sans-serif;font-weight:300;font-size:11px;letter-spacing:0.05em;cursor:pointer;text-transform:uppercase;transition:border-color .3s,color .3s}
 .btn:hover{border-color:#666;color:#ccc}
-.lnk{font-size:11px;color:#444;font-family:'IBM Plex Mono',monospace;cursor:pointer;text-decoration:underline;text-underline-offset:4px;transition:color .3s}
+
 .lnk:hover{color:#888}
 
 #scr-cal{position:fixed;inset:0;background:#000;display:none;z-index:100}
-#cal-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'IBM Plex Mono',monospace;font-size:11px;color:#888;letter-spacing:0.2em;text-align:center;line-height:2;pointer-events:none}
+#cal-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'neue-haas-grotesk-display',sans-serif;font-weight:300;font-size:11px;color:#888;letter-spacing:0.05em;text-align:center;line-height:2;pointer-events:none}
 .cdot{position:absolute;width:22px;height:22px;border-radius:50%;background:#c84b1e;transform:translate(-50%,-50%);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;box-shadow:0 0 0 7px rgba(200,75,30,.18);transition:opacity .3s}
 .cdot.off{opacity:.2;pointer-events:none}
 .cdot.done{opacity:.1;pointer-events:none}
@@ -48,7 +48,7 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 #scr-done .big{font-size:13px;color:#444}
 
 
-@media(max-width:600px){#scr-start{align-items:center;justify-content:center;padding:40px 20px}#scr-start .title{align-items:center;text-align:center}#btn-mouse{display:none}#reader{padding:20vh 16px 90px 16px}#txt{display:grid;grid-template-columns:70px 257px;column-gap:16px}.spk-row{display:contents}.spk{font-family:"psfournier-std",sans-serif;font-size:15px;font-weight:300;color:#555;line-height:1.5;padding-top:0;grid-column:1;align-self:start}.spk-row .para{grid-column:2;margin:0}.para.no-spk{grid-column:2;padding-left:0;margin-bottom:1.4em}.para{margin-bottom:1.4em;max-width:none}}
+@media(max-width:600px){#scr-start{align-items:center;justify-content:center;padding:40px 20px}#scr-start .title{align-items:center;text-align:center}#reader{padding:20vh 16px 90px 16px}#txt{display:grid;grid-template-columns:70px 257px;column-gap:16px}.spk-row{display:contents}.spk{font-family:"psfournier-std",sans-serif;font-size:15px;font-weight:300;color:#555;line-height:1.5;padding-top:0;grid-column:1;align-self:start}.spk-row .para{grid-column:2;margin:0}.para.no-spk{grid-column:2;padding-left:0;margin-bottom:1.4em}.para{margin-bottom:1.4em;max-width:none}}
 </style>
 <link rel="stylesheet" href="https://use.typekit.net/azt6kde.css">
 </head>
@@ -56,9 +56,7 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 
 <div id="scr-start">
   <div class="title"><span>The</span><span>Pancake</span><span>Family</span></div>
-  <p class="warn">⚠ Camera access required</p>
   <button class="btn" id="btn-start">Read</button>
-  <span class="lnk" id="btn-mouse">Try with mouse instead</span>
 </div>
 
 <div id="scr-cal">
@@ -546,10 +544,6 @@ document.getElementById('btn-start').addEventListener('click', ()=>{
     });
 });
 
-document.getElementById('btn-mouse').addEventListener('click', ()=>{
-  document.getElementById('scr-start').style.display = 'none';
-  startReader(true);
-});
 </script>
 </body>
 </html>
