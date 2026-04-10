@@ -377,7 +377,7 @@ function startReader(mouseMode) {
 /* ── FaceMesh ── */
 let faceMesh, cam;
 const smoothBuf = [];
-const SMOOTH_N  = IS_MOBILE ? 3 : 7;
+const SMOOTH_N  = IS_MOBILE ? 5 : 9;
 let blinkCooldown = 0;
 const cal = [];
 let lastRaw = {x:.5, y:.5};
@@ -438,17 +438,19 @@ function initFaceMesh() {
     if (blinkCooldown>0) { blinkCooldown--; return; }
     let rx, ry;
     if (IS_MOBILE) {
-      // 모바일: 눈 코너 대비 iris 상대 비율 — 좌우 움직임 민감도 향상
-      const lInner=lm[133],lOuter=lm[33],rInner=lm[362],rOuter=lm[263];
-      const lW=Math.abs(lOuter.x-lInner.x), rW=Math.abs(rOuter.x-rInner.x);
-      const lRx=lW>0.001?(lI.x-lInner.x)/lW:0.5;
-      const rRx=rW>0.001?(rI.x-rInner.x)/rW:0.5;
-      // Y는 눈 높이 대비 비율
-      const lH=Math.abs(lB.y-lT.y), rH=Math.abs(rB.y-rT.y);
-      const lRy=lH>0.001?(lI.y-lT.y)/lH:0.5;
-      const rRy=rH>0.001?(rI.y-rT.y)/rH:0.5;
-      rx = 1-((lRx+rRx)/2);
-      ry = (lRy+rRy)/2;
+      // 모바일: iris + 얼굴 중심 혼합 — 안정적이고 좌우 반응 좋음
+      // 코 끝(1), 눈 사이 중심(168), 턱(152)으로 얼굴 방향 추정
+      const nose = lm[1], brow = lm[168], chin = lm[152];
+      const eyeC = {x:(lI.x+rI.x)/2, y:(lI.y+rI.y)/2};
+      // 얼굴 중심 X: 코 끝과 눈 중심의 좌우 차이 → 좌우 회전 반영
+      const faceX = 1 - (nose.x*0.6 + eyeC.x*0.4);
+      // 얼굴 중심 Y: 코 끝과 눈썹 중심의 상하 비율
+      const faceH = Math.abs(chin.y - brow.y) || 0.01;
+      const faceY = (nose.y - brow.y) / faceH;
+      // iris Y 보조
+      const irisY = (lI.y + rI.y) / 2;
+      rx = faceX;
+      ry = faceY * 0.7 + irisY * 0.3;
     } else {
       rx = 1-(lI.x+rI.x)/2;
       ry = (lI.y+rI.y)/2;
