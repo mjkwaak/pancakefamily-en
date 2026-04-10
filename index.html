@@ -13,9 +13,9 @@
 html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min-height:100vh;overflow-x:hidden}
 
 /* ── 표지 ── */
-#scr-start{position:fixed;inset:0;background:#000;display:flex;align-items:flex-start;padding:40px 250px;z-index:100;}
-#scr-start .title{font-family:'adobe-myungjo-std',serif;font-weight:500;font-size:22px;color:#fff;display:flex;flex-direction:column;line-height:1.05;letter-spacing:-0.01em;pointer-events:none;}
-.btn{background:transparent;border:none;color:#888;font-family:'adobe-myungjo-std',serif;font-weight:500;font-size:22px;letter-spacing:0.05em;cursor:pointer;transition:color .3s;position:fixed;top:40px;left:calc(50% + 20px);padding:0;}
+#scr-start{position:fixed;inset:0;background:#000;display:flex;flex-direction:row;align-items:flex-start;padding:40px 250px;z-index:100;}
+#scr-start .title{font-family:'adobe-myungjo-std',serif;font-weight:500;font-size:22px;color:#fff;display:flex;flex-direction:column;line-height:1.05;letter-spacing:-0.01em;pointer-events:none;flex-shrink:0;}
+.btn{background:transparent;border:none;color:#888;font-family:'adobe-myungjo-std',serif;font-weight:500;font-size:22px;letter-spacing:0.05em;cursor:pointer;transition:color .3s;padding:0;white-space:nowrap;margin-left:auto;}
 .btn:hover{color:#fff}
 
 /* ── 보정 화면 ── */
@@ -87,7 +87,7 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 #scr-done p{font-family:'IBM Plex Mono',monospace;font-size:11px;
   color:#555;letter-spacing:0.2em;text-align:center;line-height:2}
 #scr-done .big{font-size:13px;color:#444}
-@media(max-width:600px){#scr-start{position:fixed;inset:0;background:#000;display:flex;align-items:flex-start;padding:20px 20px;z-index:100}#scr-start .title{font-size:22px;line-height:1.05;top:20px;left:50%;font-size:22px;padding:0}#reader-title{top:20px;left:20px;font-size:22px}#txt-wrap{top:30vh;right:0;width:70%;padding:0 20px;bottom:40px}.para{font-size:13px;line-height:1.5;margin-bottom:1.4em}.spk-row{grid-template-columns:70px 1fr;column-gap:10px;margin-bottom:1.4em;margin-left:-80px}.spk{font-size:13px}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{padding-left:0}}</style>
+@media(max-width:600px){#scr-start{position:fixed;inset:0;background:#000;display:flex;flex-direction:row;align-items:flex-start;padding:40px 250px;z-index:100;}#scr-start .title{font-family:'adobe-myungjo-std',serif;font-weight:500;font-size:22px;color:#fff;display:flex;flex-direction:column;line-height:1.05;letter-spacing:-0.01em;pointer-events:none;flex-shrink:0;}#reader-title{top:20px;left:20px;font-size:22px}#txt-wrap{top:24vh;right:0;width:70%;padding:0 20px 40px;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch}.para{font-size:13px;line-height:1.5;margin-bottom:1.4em}.spk-row{grid-template-columns:70px 1fr;column-gap:10px;margin-bottom:1.4em;margin-left:-80px}.spk{font-size:13px}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{padding-left:0}}</style>
 <script>
   (function(d){
     var config={kitId:'azt6kde',scriptTimeout:3000,async:true},
@@ -516,8 +516,13 @@ function initFaceMesh() {
     }
     lastRaw = {x:rx, y:ry};
     const sm = smoothGaze(rx, ry);
-    const mp = mapGaze(sm.x, sm.y);
-    moveGazeDot(mp.x, mp.y);
+    // 보정 완료 전: raw 비례값으로 직접 표시 (화면 전체 범위 활용)
+    const W = window.innerWidth, H = window.innerHeight;
+    if (!mapCoef) {
+      moveGazeDot(sm.x * W, sm.y * H);
+    } else {
+      moveGazeDot(mapGaze(sm.x, sm.y).x, mapGaze(sm.x, sm.y).y);
+    }
   });
 }
 
@@ -579,8 +584,11 @@ function setupCalDots() {
         if (calIdx<pos.length) {
           calDots[calIdx].classList.remove('off');
         } else {
-          buildMapCoef();
-          startReader(false);
+          // 마지막 점 처리 후 한 프레임 쉬고 시작 (렉 방지)
+          setTimeout(() => {
+            buildMapCoef();
+            startReader(false);
+          }, 50);
         }
       } catch(err) { console.error('calTap error:', err); }
     };
