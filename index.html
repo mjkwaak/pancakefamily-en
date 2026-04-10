@@ -157,7 +157,7 @@ html,body{height:100%;background:#000;color:#fff}
     right:0 !important;
     width:50% !important;
     bottom:0 !important;
-    padding:20px 12px 80px 0 !important;
+    padding:20px 12px 80px 56px !important;
     overflow-y:scroll !important;
     -webkit-overflow-scrolling:touch !important;
     overscroll-behavior-y:contain !important
@@ -169,22 +169,22 @@ html,body{height:100%;background:#000;color:#fff}
     margin-bottom:1.4em !important;
     color:#fff !important
   }
-  /* 모든 행 본문 시작선 통일, interviewer는 본문 바로 왼쪽 */
+  /* spk-row: padding으로 본문 들여쓰기 없이, spk는 왼쪽 padding 영역에 */
   .spk-row{
-    display:block !important;
-    position:relative !important;
-    margin-bottom:1.4em !important
+    display:grid !important;
+    grid-template-columns:52px 1fr !important;
+    column-gap:0 !important;
+    margin-bottom:1.4em !important;
+    margin-left:-56px !important
   }
   .spk{
-    position:absolute !important;
-    right:100% !important;
-    top:2px !important;
-    padding-right:8px !important;
     font-size:13px !important;
     color:#555 !important;
-    white-space:nowrap !important
+    padding-top:2px !important;
+    padding-right:8px !important;
+    text-align:right !important
   }
-  .spk-row .para{margin:0 !important}
+  .spk-row .para{grid-column:2 !important;margin:0 !important}
   .para.no-spk{padding-left:0 !important}
 }
 </style>
