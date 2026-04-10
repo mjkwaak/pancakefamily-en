@@ -150,14 +150,14 @@ html,body{height:100%;background:#000;color:#fff}
     z-index:20 !important
   }
 
-  /* 본문 영역: 화면 50% 폭, 오른쪽 정렬 */
+  /* 본문 영역: 화면 오른쪽 50% */
   #txt-wrap{
     top:0 !important;
     left:auto !important;
     right:0 !important;
     width:50% !important;
     bottom:0 !important;
-    padding:20px 12px 80px 56px !important;
+    padding:20px 12px 80px 0 !important;
     overflow-y:scroll !important;
     -webkit-overflow-scrolling:touch !important;
     overscroll-behavior-y:contain !important
@@ -169,23 +169,20 @@ html,body{height:100%;background:#000;color:#fff}
     margin-bottom:1.4em !important;
     color:#fff !important
   }
-  /* spk-row: padding으로 본문 들여쓰기 없이, spk는 왼쪽 padding 영역에 */
+  /* spk-row: 본문과 동일 폭, spk는 txt-wrap 왼쪽 경계 밖 fixed */
   .spk-row{
-    display:grid !important;
-    grid-template-columns:52px 1fr !important;
-    column-gap:0 !important;
-    margin-bottom:1.4em !important;
-    margin-left:-56px !important
+    display:block !important;
+    margin-bottom:1.4em !important
   }
+  .spk-row .para{margin:0 !important}
+  .para.no-spk{padding-left:0 !important}
+  /* spk는 JS로 위치 계산 */
   .spk{
+    position:fixed !important;
     font-size:13px !important;
     color:#555 !important;
-    padding-top:2px !important;
-    padding-right:8px !important;
-    text-align:right !important
+    white-space:nowrap !important
   }
-  .spk-row .para{grid-column:2 !important;margin:0 !important}
-  .para.no-spk{padding-left:0 !important}
 }
 </style>
 </head>
@@ -521,6 +518,7 @@ function startReader(mouseMode) {
   }
   buildText();
   requestAnimationFrame(tick);
+  if (IS_MOBILE) setTimeout(updateSpkPositions, 100);
 }
 
 /* FaceMesh */
@@ -669,6 +667,23 @@ function setupCalDots() {
 }
 
 document.getElementById('reader-title').addEventListener('click', ()=>location.reload());
+
+// 모바일 spk 위치 동적 갱신
+function updateSpkPositions() {
+  if (!IS_MOBILE) return;
+  const spkEls = document.querySelectorAll('.spk');
+  spkEls.forEach(spk => {
+    const row = spk.parentElement;
+    const rect = row.getBoundingClientRect();
+    spk.style.top = rect.top + 'px';
+    spk.style.left = (window.innerWidth * 0.5 - spk.offsetWidth - 8) + 'px';
+  });
+}
+if (IS_MOBILE) {
+  document.getElementById('txt-wrap').addEventListener('scroll', updateSpkPositions);
+  window.addEventListener('resize', updateSpkPositions);
+}
+
 
 document.getElementById('btn-start').addEventListener('click', ()=>{
   navigator.mediaDevices.getUserMedia({video:true})
