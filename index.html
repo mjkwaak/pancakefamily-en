@@ -2,126 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <title>Pancake Family</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{height:100%;overflow:hidden}body{height:100%;overflow:hidden;background:#000;color:#fff;font-family:"psfournier-std",sans-serif}
-
-/* ── 표지 ── */
-#scr-start{position:fixed;inset:0;background:#000;display:flex;flex-direction:row;align-items:flex-start;padding:40px 250px;z-index:100;overflow:hidden;touch-action:none;}
-#scr-start .title{font-family:'adobe-myungjo-std',serif;font-weight:500;font-size:22px;color:#fff;display:flex;flex-direction:column;line-height:1.05;letter-spacing:-0.01em;pointer-events:none;flex-shrink:0;}
-.btn{background:transparent;border:none;color:#888;font-family:'adobe-myungjo-std',serif;font-weight:500;font-size:22px;letter-spacing:-0.01em;cursor:pointer;transition:color .3s;padding:0;white-space:nowrap;position:fixed;top:40px;left:58%;}
-.btn:hover{color:#fff}
-
-/* ── 보정 화면 ── */
-#scr-cal{position:fixed;inset:0;background:#000;display:none;z-index:100}
-#cal-label{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  font-family:'adobe-myungjo-std',serif;font-weight:500;font-size:15px;
-  color:#888;letter-spacing:0.04em;text-align:center;line-height:1.5;pointer-events:none
-}
-.cdot{position:absolute;width:22px;height:22px;border-radius:50%;background:#c84b1e;
-  transform:translate(-50%,-50%);cursor:pointer;touch-action:manipulation;
-  -webkit-tap-highlight-color:transparent;
-  box-shadow:0 0 0 7px rgba(200,75,30,.18);transition:opacity .3s}
-.cdot.off{opacity:.2;pointer-events:none}
-.cdot.done{opacity:.1;pointer-events:none}
-
-/* ── 유틸 ── */
-#vid{display:none!important}
-#dot{position:fixed;width:14px;height:14px;border-radius:50%;
-  background:rgba(200,75,30,.8);pointer-events:none;z-index:9999;
-  transform:translate(-50%,-50%);visibility:hidden;left:-50px;top:-50px}
-#bar{position:fixed;top:0;left:0;height:1px;background:#c84b1e;width:0;z-index:98}
-#sbar{position:fixed;bottom:0;left:0;right:0;padding:10px 28px;
-  display:none!important;font-family:'IBM Plex Mono',monospace;font-size:10px;
-  color:#2a2a2a;letter-spacing:0.12em;background:#000;
-  border-top:1px solid rgba(255,255,255,.06);
-  justify-content:space-between;align-items:center}
-
-/* ── 리더 ── */
-#reader{display:none;position:fixed;inset:0;padding:40px 48px}
-/* 타이틀 좌상단 고정 */
-#reader-title{
-  display:none;
-  position:fixed;top:40px;left:250px;
-  font-family:'adobe-myungjo-std',serif;font-weight:500;font-size:22px;
-  color:#fff;
-  flex-direction:column;
-  line-height:1.15;letter-spacing:0.01em;
-  pointer-events:auto;cursor:pointer;z-index:10;
-}
-/* 본문 우측 절반 */
-#txt-wrap{
-  display:none;
-  position:fixed;top:40px;right:250px;
-  width:calc(50% - 250px);
-  bottom:60px;
-  overflow-y:auto;
-  scrollbar-width:none;
-}
-#txt-wrap::-webkit-scrollbar{display:none}
-#txt{display:flex;flex-direction:column}
-
-.para{line-height:1.3;font-size:15px;color:#fff;
-  font-family:"psfournier-std",sans-serif;font-weight:300;
-  letter-spacing:0.04em;margin-bottom:1.6em}
-.ch{display:inline}
-
-.spk-row{display:grid;grid-template-columns:80px 1fr;
-  column-gap:20px;margin-bottom:1.6em;align-items:start}
-.spk{font-family:"psfournier-std",sans-serif;font-size:15px;font-weight:300;color:#555;padding-top:1px}
-.spk-row .para{margin-top:0;margin-bottom:0}
-.para.no-spk{padding-left:100px}
-
-#scr-done{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);
-  z-index:100;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
-#scr-done p{font-family:'IBM Plex Mono',monospace;font-size:11px;
-  color:#555;letter-spacing:0.2em;text-align:center;line-height:2}
-#scr-done .big{font-size:13px;color:#444}
-@media(max-width:600px){
-/* 첫화면 */
-#scr-start{padding:20px 12px;touch-action:none}
-#scr-start .title{font-size:17px}
-.btn{position:fixed;top:20px;left:50%;font-size:17px;padding:0}
-/* 보정 안내 */
-#cal-label{font-size:13px}
-/* 본문 타이틀: 좌상단 고정, 초기 hidden — JS가 표시 */
-#reader-title{
-  display:none;
-  position:fixed;top:0;left:0;
-  padding:20px 12px 0;
-  font-size:17px;line-height:1.05;letter-spacing:-0.01em;
-  flex-direction:column;
-  background:transparent;
-  z-index:20;width:130px;
-  pointer-events:auto;cursor:pointer
-}
-/* 본문 영역: 타이틀 오른쪽, 초기 hidden — JS가 표시 */
-#txt-wrap{
-  display:none;
-  position:fixed;
-  top:0;left:130px;right:0;bottom:0;
-  padding:24vh 12px 60px 0;
-  overflow-y:scroll;
-  -webkit-overflow-scrolling:touch;
-  touch-action:pan-y;
-  scrollbar-width:none
-}
-#txt-wrap::-webkit-scrollbar{display:none}
-/* 본문 텍스트 */
-.para{font-size:13px;line-height:1.5;margin-bottom:1.4em;color:#fff}
-/* Interviewer 행 */
-.spk-row{display:grid;grid-template-columns:50px 1fr;column-gap:6px;margin-bottom:1.4em}
-.spk{font-size:11px;color:#555;padding-top:2px}
-.spk-row .para{grid-column:2;margin:0}
-.para.no-spk{padding-left:56px}
-}</style>
 <script>
   (function(d){
     var config={kitId:'azt6kde',scriptTimeout:3000,async:true},
@@ -133,6 +17,167 @@ html{height:100%;overflow:hidden}body{height:100%;overflow:hidden;background:#00
     try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s);
   })(document);
 </script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#000;color:#fff}
+
+/* ══ 표지 ══ */
+#scr-start{
+  position:fixed;inset:0;background:#000;z-index:100;
+  display:flex;flex-direction:row;align-items:flex-start;
+  padding:40px 250px;
+  overflow:hidden;touch-action:none
+}
+#scr-start .title{
+  font-family:'adobe-myungjo-std',serif;font-weight:500;
+  font-size:22px;color:#fff;
+  display:flex;flex-direction:column;
+  line-height:1.05;letter-spacing:-0.01em;
+  pointer-events:none;flex-shrink:0
+}
+.btn{
+  background:transparent;border:none;color:#888;
+  font-family:'adobe-myungjo-std',serif;font-weight:500;
+  font-size:22px;letter-spacing:-0.01em;
+  cursor:pointer;transition:color .3s;
+  padding:0;white-space:nowrap;
+  position:fixed;top:40px;left:58%
+}
+.btn:hover{color:#fff}
+
+/* ══ 보정 화면 ══ */
+#scr-cal{position:fixed;inset:0;background:#000;display:none;z-index:100}
+#cal-label{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:'adobe-myungjo-std',serif;font-weight:500;
+  font-size:15px;color:#888;
+  letter-spacing:0.04em;text-align:center;line-height:1.5;
+  pointer-events:none
+}
+.cdot{
+  position:absolute;width:22px;height:22px;border-radius:50%;
+  background:#c84b1e;transform:translate(-50%,-50%);
+  cursor:pointer;touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  box-shadow:0 0 0 7px rgba(200,75,30,.18);transition:opacity .3s
+}
+.cdot.off{opacity:.2;pointer-events:none}
+.cdot.done{opacity:.1;pointer-events:none}
+
+/* ══ 유틸 ══ */
+#vid{display:none!important}
+#dot{
+  position:fixed;width:14px;height:14px;border-radius:50%;
+  background:rgba(200,75,30,.8);pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);visibility:hidden;left:-50px;top:-50px
+}
+#bar{position:fixed;top:0;left:0;height:1px;background:#c84b1e;width:0;z-index:98}
+#sbar{
+  position:fixed;bottom:0;left:0;right:0;padding:10px 28px;
+  display:none;font-family:'IBM Plex Mono',monospace;font-size:10px;
+  color:#2a2a2a;letter-spacing:0.12em;background:#000;
+  border-top:1px solid rgba(255,255,255,.06);
+  justify-content:space-between;align-items:center
+}
+
+/* ══ 리더 타이틀 (PC) ══ */
+#reader-title{
+  display:none;
+  position:fixed;top:40px;left:250px;
+  font-family:'adobe-myungjo-std',serif;font-weight:500;font-size:22px;
+  color:#fff;flex-direction:column;
+  line-height:1.15;letter-spacing:0.01em;
+  pointer-events:auto;cursor:pointer;z-index:10
+}
+
+/* ══ 본문 영역 (PC) ══ */
+#txt-wrap{
+  display:none;
+  position:fixed;top:40px;right:250px;
+  width:calc(50% - 250px);bottom:60px;
+  overflow-y:auto;scrollbar-width:none
+}
+#txt-wrap::-webkit-scrollbar{display:none}
+#txt{display:flex;flex-direction:column}
+
+/* ══ 본문 텍스트 ══ */
+.para{
+  line-height:1.3;font-size:15px;color:#fff;
+  font-family:"psfournier-std",sans-serif;font-weight:300;
+  letter-spacing:0.04em;margin-bottom:1.6em
+}
+.ch{display:inline}
+.spk-row{
+  display:grid;grid-template-columns:80px 1fr;
+  column-gap:20px;margin-bottom:1.6em;align-items:start
+}
+.spk{
+  font-family:"psfournier-std",sans-serif;
+  font-size:15px;font-weight:300;color:#555;padding-top:1px
+}
+.spk-row .para{margin-top:0;margin-bottom:0}
+.para.no-spk{padding-left:100px}
+
+/* ══ 완료 ══ */
+#scr-done{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);
+  z-index:100;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem
+}
+#scr-done p{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;
+  color:#555;letter-spacing:0.2em;text-align:center;line-height:2
+}
+#scr-done .big{font-size:13px;color:#444}
+
+/* ══ 모바일 ══ */
+@media (max-width:600px) {
+
+  #scr-start{padding:20px 12px;touch-action:none}
+  #scr-start .title{font-size:17px}
+  .btn{position:fixed;top:20px;left:50%;font-size:17px;padding:0}
+
+  /* 리더 타이틀: 왼쪽 고정 */
+  #reader-title{
+    top:0 !important;
+    left:0 !important;
+    width:130px !important;
+    padding:20px 12px 0 !important;
+    font-size:17px !important;
+    line-height:1.05 !important;
+    letter-spacing:-0.01em !important;
+    background:#000 !important;
+    z-index:20 !important
+  }
+
+  /* 본문: 타이틀 오른쪽부터 화면 끝까지 */
+  #txt-wrap{
+    top:0 !important;
+    left:130px !important;
+    right:0 !important;
+    bottom:0 !important;
+    width:auto !important;
+    padding:24vh 12px 80px 0 !important;
+    overflow-y:scroll !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior-y:contain !important
+  }
+
+  .para{
+    font-size:13px !important;
+    line-height:1.5 !important;
+    margin-bottom:1.4em !important;
+    color:#fff !important
+  }
+  .spk-row{
+    grid-template-columns:46px 1fr !important;
+    column-gap:6px !important;
+    margin-bottom:1.4em !important
+  }
+  .spk{font-size:11px !important;color:#555 !important;padding-top:2px !important}
+  .spk-row .para{grid-column:2 !important;margin:0 !important}
+  .para.no-spk{padding-left:52px !important}
+}
+</style>
 </head>
 <body>
 
@@ -152,7 +197,6 @@ html{height:100%;overflow:hidden}body{height:100%;overflow:hidden;background:#00
 
 <div id="reader-title"><span>The</span><span>Pancake</span><span>Family</span></div>
 <div id="txt-wrap"><div id="txt"></div></div>
-<div id="reader"></div>
 
 <div id="scr-done">
   <p class="big">The book has vanished.</p>
@@ -339,17 +383,16 @@ const RAW=[
   {s:"Interviewer",t:"Are you sure? There is no one by the last name of Bamer on staff with the Daily World."},
 ];
 
-/* ── 전역 ── */
 const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 const RADIUS = IS_MOBILE ? 30 : 40;
 const FADE   = 0.2;
 const BLINK_SUPPRESS = IS_MOBILE ? 3 : 0;
 const BLINK_THRESH   = IS_MOBILE ? 0.02 : 0.018;
 
-const dotEl  = document.getElementById('dot');
-const barEl  = document.getElementById('bar');
-const sbarR  = document.getElementById('sbar-r');
-const sbarL  = document.getElementById('sbar-l');
+const dotEl = document.getElementById('dot');
+const barEl = document.getElementById('bar');
+const sbarR = document.getElementById('sbar-r');
+const sbarL = document.getElementById('sbar-l');
 
 let gx = -999, gy = -999;
 let chars = [], total = 0;
@@ -359,30 +402,24 @@ function moveGazeDot(x, y) {
   gx = x; gy = y;
   dotEl.style.left = x + 'px';
   dotEl.style.top  = y + 'px';
-  if (dotEl.style.visibility !== 'visible') dotEl.style.visibility = 'visible';
+  dotEl.style.visibility = 'visible';
 }
 
-/* ── 글자 렌더링 ── */
 function buildText() {
   const c = document.getElementById('txt');
   c.innerHTML = ''; chars = [];
 
-  // reader-title 글자 소멸 대상
-  const rTitle = document.getElementById('reader-title');
-  if (rTitle) {
-    rTitle.querySelectorAll('span').forEach(lineSpan => {
-      const text = lineSpan.textContent;
-      lineSpan.textContent = '';
-      [...text].forEach(ch => {
-        const s = document.createElement('span');
-        s.className = 'ch'; s.textContent = ch;
-        lineSpan.appendChild(s);
-        chars.push({el:s, op:1, gone:false});
-      });
+  // reader-title 글자도 소멸 대상
+  document.getElementById('reader-title').querySelectorAll('span').forEach(sp => {
+    const text = sp.textContent; sp.textContent = '';
+    [...text].forEach(ch => {
+      const s = document.createElement('span');
+      s.className = 'ch'; s.textContent = ch;
+      sp.appendChild(s);
+      chars.push({el:s, op:1, gone:false});
     });
-  }
+  });
 
-  // DocumentFragment로 한 번에 추가 — reflow 최소화
   const frag = document.createDocumentFragment();
   RAW.forEach(b => {
     if (b.s) {
@@ -392,7 +429,7 @@ function buildText() {
       sp.className = 'spk';
       [...b.s].forEach(ch => {
         const sc = document.createElement('span');
-        sc.className = 'ch'; sc.textContent = ch;
+        sc.className='ch'; sc.textContent=ch;
         sp.appendChild(sc);
         chars.push({el:sc, op:1, gone:false});
       });
@@ -401,11 +438,10 @@ function buildText() {
       p.className = 'para';
       [...b.t].forEach(ch => {
         const s = document.createElement('span');
-        s.className = 'ch'; s.textContent = ch;
+        s.className='ch'; s.textContent=ch;
         p.appendChild(s);
         chars.push({el:s, op:1, gone:false});
       });
-      p.appendChild(document.createTextNode(' '));
       row.appendChild(p);
       frag.appendChild(row);
     } else {
@@ -413,11 +449,10 @@ function buildText() {
       p.className = 'para no-spk';
       [...b.t].forEach(ch => {
         const s = document.createElement('span');
-        s.className = 'ch'; s.textContent = ch;
+        s.className='ch'; s.textContent=ch;
         p.appendChild(s);
         chars.push({el:s, op:1, gone:false});
       });
-      p.appendChild(document.createTextNode(' '));
       frag.appendChild(p);
     }
   });
@@ -425,13 +460,12 @@ function buildText() {
   total = chars.length;
 }
 
-/* ── 프레임 루프 ── */
 function tick() {
   rafId = requestAnimationFrame(tick);
   let dirty = false;
   chars.forEach(c => {
     if (c.gone) return;
-    const r  = c.el.getBoundingClientRect();
+    const r = c.el.getBoundingClientRect();
     const cx = (r.left + r.right) * .5;
     const cy = (r.top  + r.bottom) * .5;
     if (Math.hypot(cx - gx, cy - gy) < RADIUS) {
@@ -445,7 +479,7 @@ function tick() {
     const gone = chars.filter(c=>c.gone).length;
     const pct  = Math.round(gone/total*100);
     barEl.style.width = pct + '%';
-    sbarR.textContent = pct + '%% erased';
+    sbarR.textContent = pct + '% erased';
     if (gone === total) {
       document.getElementById('scr-done').style.display = 'flex';
       cancelAnimationFrame(rafId);
@@ -453,14 +487,18 @@ function tick() {
   }
 }
 
-/* ── 읽기 시작 ── */
 function startReader(mouseMode) {
   document.getElementById('scr-start').style.display = 'none';
   document.getElementById('scr-cal').style.display   = 'none';
-  document.getElementById('reader').style.display    = 'block';
-  document.getElementById('reader-title').style.display = 'flex';
-  document.getElementById('txt-wrap').style.display  = 'block';
   document.getElementById('sbar').style.display      = 'flex';
+
+  const rt = document.getElementById('reader-title');
+  rt.style.display = 'flex';
+  rt.style.flexDirection = 'column';
+
+  const tw = document.getElementById('txt-wrap');
+  tw.style.display = 'block';
+
   if (mouseMode) {
     sbarL.textContent = 'Mouse mode';
     dotEl.style.background = 'rgba(120,160,255,.7)';
@@ -475,13 +513,14 @@ function startReader(mouseMode) {
   requestAnimationFrame(tick);
 }
 
-/* ── FaceMesh ── */
+/* FaceMesh */
 let faceMesh, cam;
 const smoothBuf = [];
-const SMOOTH_N  = IS_MOBILE ? 8 : 7;
+const SMOOTH_N = IS_MOBILE ? 8 : 7;
 let blinkCooldown = 0;
 const cal = [];
 let lastRaw = {x:.5, y:.5};
+let mapCoef = null;
 
 function smoothGaze(x, y) {
   smoothBuf.push({x, y});
@@ -492,8 +531,6 @@ function smoothGaze(x, y) {
   };
 }
 
-// 보정 완료 후 계수 캐시 — 매 프레임 회귀 계산 방지
-let mapCoef = null;
 function buildMapCoef() {
   const W=window.innerWidth, H=window.innerHeight;
   if (cal.length < 4) { mapCoef=null; return; }
@@ -506,9 +543,11 @@ function buildMapCoef() {
   });
   const dX=n*sRX2-sRX*sRX, dY=n*sRY2-sRY*sRY;
   if (Math.abs(dX)<1e-6||Math.abs(dY)<1e-6) { mapCoef=null; return; }
-  const ax=(n*sRXSX-sRX*sSX)/dX, bx=(sSX-ax*sRX)/n;
-  const ay=(n*sRYSY-sRY*sSY)/dY, by=(sSY-ay*sRY)/n;
-  mapCoef={ax,bx,ay,by,W,H};
+  mapCoef={
+    ax:(n*sRXSX-sRX*sSX)/dX, bx:(sSX-(n*sRXSX-sRX*sSX)/dX*sRX)/n,
+    ay:(n*sRYSY-sRY*sSY)/dY, by:(sSY-(n*sRYSY-sRY*sSY)/dY*sRY)/n,
+    W, H
+  };
 }
 
 function mapGaze(rx, ry) {
@@ -530,42 +569,27 @@ function initFaceMesh() {
     if (!lI||!rI) return;
     const lT=lm[159],lB=lm[145],rT=lm[386],rB=lm[374];
     if (lT&&lB&&rT&&rB) {
-      const openAvg = (Math.abs(lB.y-lT.y)+Math.abs(rB.y-rT.y))/2;
-      if (openAvg < BLINK_THRESH) {
-        blinkCooldown = BLINK_SUPPRESS;
-        // 깜빡임 중엔 위치 업데이트만 스킵, 점은 멈추지 않음 (이전 위치 유지)
-        return;
+      if ((Math.abs(lB.y-lT.y)+Math.abs(rB.y-rT.y))/2 < BLINK_THRESH) {
+        blinkCooldown = BLINK_SUPPRESS; return;
       }
     }
-    // cooldown 중에도 점은 이전 위치에 그대로 — return하지 않고 통과
     if (blinkCooldown > 0) { blinkCooldown--; return; }
     let rx, ry;
     if (IS_MOBILE) {
-      // 모바일: iris + 얼굴 중심 혼합 — 안정적이고 좌우 반응 좋음
-      // 코 끝(1), 눈 사이 중심(168), 턱(152)으로 얼굴 방향 추정
-      const nose = lm[1], brow = lm[168], chin = lm[152];
-      const eyeC = {x:(lI.x+rI.x)/2, y:(lI.y+rI.y)/2};
-      // 얼굴 중심 X: 코 끝과 눈 중심의 좌우 차이 → 좌우 회전 반영
-      const faceX = 1 - (nose.x*0.6 + eyeC.x*0.4);
-      // 얼굴 중심 Y: 코 끝과 눈썹 중심의 상하 비율
-      const faceH = Math.abs(chin.y - brow.y) || 0.01;
-      const faceY = (nose.y - brow.y) / faceH;
-      // iris Y 보조
-      const irisY = (lI.y + rI.y) / 2;
-      rx = faceX;
-      ry = faceY * 0.7 + irisY * 0.3;
+      const nose=lm[1], brow=lm[168], chin=lm[152];
+      const eyeCx=(lI.x+rI.x)/2, eyeCy=(lI.y+rI.y)/2;
+      rx = 1-(nose.x*0.6+eyeCx*0.4);
+      const faceH = Math.abs(chin.y-brow.y)||0.01;
+      ry = (nose.y-brow.y)/faceH*0.7 + (lI.y+rI.y)/2*0.3;
     } else {
       rx = 1-(lI.x+rI.x)/2;
       ry = (lI.y+rI.y)/2;
     }
     lastRaw = {x:rx, y:ry};
     const sm = smoothGaze(rx, ry);
-    // 보정 완료 전: raw 비례값으로 직접 표시 (화면 전체 범위 활용)
-    const W = window.innerWidth, H = window.innerHeight;
-    const mapped = mapCoef
-      ? mapGaze(sm.x, sm.y)
-      : {x: sm.x * W, y: sm.y * H};
-    moveGazeDot(mapped.x, mapped.y);
+    const W=window.innerWidth, H=window.innerHeight;
+    const mp = mapCoef ? mapGaze(sm.x,sm.y) : {x:sm.x*W, y:sm.y*H};
+    moveGazeDot(mp.x, mp.y);
   });
 }
 
@@ -576,15 +600,15 @@ function startCam() {
   cam = new Camera(v, {
     onFrame: async () => {
       if (IS_MOBILE && skipFrame) { skipFrame=false; return; }
-      if (IS_MOBILE) { skipFrame=true; }
+      if (IS_MOBILE) skipFrame=true;
       await faceMesh.send({image:v});
     },
-    width: IS_MOBILE ? 320 : 640, height: IS_MOBILE ? 240 : 480,
+    width: IS_MOBILE ? 320 : 640,
+    height: IS_MOBILE ? 240 : 480,
   });
   cam.start();
 }
 
-/* ── 보정 점 ── */
 function calPositions() {
   const W=window.innerWidth, H=window.innerHeight;
   const vvp=window.visualViewport;
@@ -600,37 +624,32 @@ function calPositions() {
 window.addEventListener('resize', ()=>{
   if (!cal.length) return;
   const W=window.innerWidth, H=window.innerHeight;
-  cal.forEach(p=>{
-    if (p.rx_ratio!==undefined) { p.sx=p.rx_ratio*W; p.sy=p.ry_ratio*H; }
-  });
+  cal.forEach(p=>{ if(p.rx_ratio!==undefined){p.sx=p.rx_ratio*W;p.sy=p.ry_ratio*H;} });
 });
 
 let calIdx=0, calDots=[];
 function setupCalDots() {
   const scr=document.getElementById('scr-cal');
   const pos=calPositions();
-  pos.forEach(([sx,sy],i) => {
+  pos.forEach(([sx,sy],i)=>{
     const d=document.createElement('div');
     d.className='cdot'+(i>0?' off':'');
     d.style.left=sx+'px'; d.style.top=sy+'px';
     const onTap=(e)=>{
-      try {
-        if (e && e.cancelable) e.preventDefault();
-        if (i!==calIdx) return;
-        // lastRaw 우선 사용 (smoothBuf 비어있어도 안전)
-        const avgRX = lastRaw.x;
-        const avgRY = lastRaw.y;
-        cal.push({rx:avgRX,ry:avgRY,sx,sy,
+      try{
+        if(e&&e.cancelable) e.preventDefault();
+        if(i!==calIdx) return;
+        cal.push({rx:lastRaw.x,ry:lastRaw.y,sx,sy,
           rx_ratio:sx/window.innerWidth,ry_ratio:sy/window.innerHeight});
         d.classList.add('done');
         calIdx++;
-        if (calIdx<pos.length) {
+        if(calIdx<pos.length){
           calDots[calIdx].classList.remove('off');
         } else {
           buildMapCoef();
           startReader(false);
         }
-      } catch(err) { console.error('calTap error:', err); }
+      }catch(err){console.error(err);}
     };
     d.addEventListener('click', onTap);
     d.addEventListener('touchend', onTap, {passive:false});
@@ -639,33 +658,24 @@ function setupCalDots() {
   });
 }
 
-/* ── 버튼 ── */
-
-// 타이틀 클릭 → 첫 화면으로 (페이지 리로드)
-const readerTitle = document.getElementById('reader-title');
-if (readerTitle) {
-  readerTitle.addEventListener('click', () => {
-    location.reload();
-  });
-}
+document.getElementById('reader-title').addEventListener('click', ()=>location.reload());
 
 document.getElementById('btn-start').addEventListener('click', ()=>{
   navigator.mediaDevices.getUserMedia({video:true})
-    .then(stream => {
+    .then(stream=>{
       stream.getTracks().forEach(t=>t.stop());
-      document.getElementById('scr-start').style.display = 'none';
-      document.getElementById('scr-cal').style.display   = 'block';
-      dotEl.style.visibility = 'visible';
+      document.getElementById('scr-start').style.display='none';
+      document.getElementById('scr-cal').style.display='block';
+      dotEl.style.visibility='visible';
       initFaceMesh();
       setupCalDots();
       startCam();
     })
     .catch(()=>{
-      document.getElementById('scr-start').style.display = 'none';
+      document.getElementById('scr-start').style.display='none';
       startReader(true);
     });
 });
-
 </script>
 </body>
 </html>
