@@ -46,10 +46,25 @@ html,body{overflow:hidden;height:100%;background:#000;color:#fff;font-family:"ps
 
 /* ── 리더 ── */
 #reader{display:none;position:fixed;inset:0;padding:40px 48px}
+#reader-title{display:none}
+#txt-wrap{display:none}
 /* 타이틀 좌상단 고정 */
-
+#reader-title{
+  position:fixed;top:40px;left:250px;
+  font-family:'adobe-myungjo-std',serif;font-weight:500;font-size:22px;
+  color:#fff;
+  display:flex;flex-direction:column;
+  line-height:1.15;letter-spacing:0.01em;
+  pointer-events:auto;cursor:pointer;z-index:10;
+}
 /* 본문 우측 절반 */
-
+#txt-wrap{
+  position:fixed;top:40px;right:250px;
+  width:calc(50% - 250px);
+  bottom:60px;
+  overflow-y:auto;
+  scrollbar-width:none;
+}
 #txt-wrap::-webkit-scrollbar{display:none}
 #txt{display:flex;flex-direction:column}
 
@@ -69,9 +84,7 @@ html,body{overflow:hidden;height:100%;background:#000;color:#fff;font-family:"ps
 #scr-done p{font-family:'IBM Plex Mono',monospace;font-size:11px;
   color:#555;letter-spacing:0.2em;text-align:center;line-height:2}
 #scr-done .big{font-size:13px;color:#444}
-#reader-title{position:fixed;top:40px;left:250px;font-family:'adobe-myungjo-std',serif;font-weight:500;font-size:22px;color:#fff;flex-direction:column;line-height:1.15;letter-spacing:0.01em;pointer-events:auto;cursor:pointer;z-index:10}
-#txt-wrap{position:fixed;top:40px;right:250px;width:calc(50% - 250px);bottom:60px;overflow-y:auto;scrollbar-width:none}
-@media(max-width:600px){#scr-start{padding:20px 12px;overflow:hidden;touch-action:none}#scr-start .title{font-size:17px}.btn{position:fixed;top:20px;left:50%;font-size:17px;padding:0}#reader-title{position:fixed;top:0;left:12px;padding:20px 0 0 0;font-size:17px;line-height:1.05;letter-spacing:-0.01em;background:transparent;z-index:20;width:120px;pointer-events:auto;cursor:pointer;flex-direction:column}#txt-wrap{position:fixed;top:0;left:142px;right:12px;bottom:0;padding:24vh 0 60px 0;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}#txt-wrap::-webkit-scrollbar{display:none}.para{font-size:13px;line-height:1.5;margin-bottom:1.4em}.spk-row{display:grid;grid-template-columns:50px 1fr;column-gap:8px;margin-bottom:1.4em}.spk{font-size:11px;color:#555;padding-top:2px}.spk-row .para{grid-column:2;margin:0}.para.no-spk{padding-left:58px}}</style>
+@media(max-width:600px){#scr-start{padding:20px 12px;overflow:hidden;touch-action:none}#scr-start .title{font-size:17px}.btn{position:fixed;top:20px;left:50%;font-size:17px;padding:0}#reader-title{position:fixed;top:0;left:12px;padding:20px 0 0 0;font-size:17px;line-height:1.05;letter-spacing:-0.01em;background:transparent;z-index:20;width:120px;pointer-events:auto;cursor:pointer}#txt-wrap{position:fixed;top:0;left:142px;right:12px;bottom:0;padding:24vh 0 60px 0;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}#txt-wrap::-webkit-scrollbar{display:none}.para{font-size:13px;line-height:1.5;margin-bottom:1.4em}.spk-row{display:grid;grid-template-columns:50px 1fr;column-gap:8px;margin-bottom:1.4em}.spk{font-size:11px;color:#555;padding-top:2px}.spk-row .para{grid-column:2;margin:0}.para.no-spk{padding-left:58px}}</style>
 <script>
   (function(d){
     var config={kitId:'azt6kde',scriptTimeout:3000,async:true},
@@ -100,10 +113,9 @@ html,body{overflow:hidden;height:100%;background:#000;color:#fff;font-family:"ps
 <div id="bar"></div>
 <div id="sbar"><span id="sbar-l">—</span><span id="sbar-r">0% erased</span></div>
 
-<div id="reader">
-  <div id="reader-title"><span>The</span><span>Pancake</span><span>Family</span></div>
-  <div id="txt-wrap"><div id="txt"></div></div>
-</div>
+<div id="reader-title"><span>The</span><span>Pancake</span><span>Family</span></div>
+<div id="txt-wrap"><div id="txt"></div></div>
+<div id="reader"></div>
 
 <div id="scr-done">
   <p class="big">The book has vanished.</p>
@@ -396,7 +408,7 @@ function tick() {
     const gone = chars.filter(c=>c.gone).length;
     const pct  = Math.round(gone/total*100);
     barEl.style.width = pct + '%';
-    sbarR.textContent = pct + '% erased';
+    sbarR.textContent = pct + '%% erased';
     if (gone === total) {
       document.getElementById('scr-done').style.display = 'flex';
       cancelAnimationFrame(rafId);
@@ -409,6 +421,8 @@ function startReader(mouseMode) {
   document.getElementById('scr-start').style.display = 'none';
   document.getElementById('scr-cal').style.display   = 'none';
   document.getElementById('reader').style.display    = 'block';
+  document.getElementById('reader-title').style.display = 'flex';
+  document.getElementById('txt-wrap').style.display  = 'block';
   document.getElementById('sbar').style.display      = 'flex';
   if (mouseMode) {
     sbarL.textContent = 'Mouse mode';
