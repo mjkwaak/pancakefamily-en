@@ -10,10 +10,10 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min-height:100vh;overflow-x:hidden}
+html,body{overflow:hidden;height:100%;background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min-height:100vh;overflow-x:hidden}
 
 /* ── 표지 ── */
-#scr-start{position:fixed;inset:0;background:#000;display:flex;flex-direction:row;align-items:flex-start;padding:40px 250px;z-index:100;}
+#scr-start{position:fixed;inset:0;background:#000;display:flex;flex-direction:row;align-items:flex-start;padding:40px 250px;z-index:100;overflow:hidden;touch-action:none;}
 #scr-start .title{font-family:'adobe-myungjo-std',serif;font-weight:500;font-size:22px;color:#fff;display:flex;flex-direction:column;line-height:1.05;letter-spacing:-0.01em;pointer-events:none;flex-shrink:0;}
 .btn{background:transparent;border:none;color:#888;font-family:'adobe-myungjo-std',serif;font-weight:500;font-size:22px;letter-spacing:-0.01em;cursor:pointer;transition:color .3s;padding:0;white-space:nowrap;position:fixed;top:40px;left:58%;}
 .btn:hover{color:#fff}
@@ -87,7 +87,7 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 #scr-done p{font-family:'IBM Plex Mono',monospace;font-size:11px;
   color:#555;letter-spacing:0.2em;text-align:center;line-height:2}
 #scr-done .big{font-size:13px;color:#444}
-@media(max-width:600px){#scr-start{padding:20px 20px}#scr-start .title{font-size:17px}.btn{position:fixed;top:20px;left:50%;font-size:17px;padding:0}#reader-title{top:0;left:0;padding:20px 20px 20px;font-size:17px;line-height:1.05;letter-spacing:-0.01em;background:#000;z-index:20;width:40%;pointer-events:auto;cursor:pointer}#txt-wrap{position:fixed;top:0;right:0;bottom:0;width:100%;padding:24vh 20px 60px 40%;overflow-y:auto;-webkit-overflow-scrolling:touch}.para{font-size:13px;line-height:1.5;margin-bottom:1.4em}.spk-row{display:grid;grid-template-columns:60px 1fr;column-gap:5px;margin-left:-70px;margin-bottom:1.4em}.spk{font-size:11px;color:#555;padding-top:2px;grid-column:1}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{padding-left:0;margin-left:0}}</style>
+@media(max-width:600px){#scr-start{padding:20px 20pxoverflow:hidden;touch-action:none;}#scr-start .title{font-size:17px}.btn{position:fixed;top:20px;left:50%;font-size:17px;padding:0}#reader-title{position:fixed;top:0;left:12px;padding:20px 0 0 0;font-size:17px;line-height:1.05;letter-spacing:-0.01em;background:transparent;z-index:20;width:120px;pointer-events:auto;cursor:pointer}#txt-wrap{position:fixed;top:0;left:142px;right:12px;bottom:0;padding:24vh 0 60px 0;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}.para{font-size:13px;line-height:1.5;margin-bottom:1.4em}.spk-row{display:grid;grid-template-columns:50px 1fr;column-gap:8px;margin-bottom:1.4em}.spk{font-size:11px;color:#555;padding-top:2px}.spk-row .para{grid-column:2;margin:0}.para.no-spk{padding-left:58px}}</style>
 <script>
   (function(d){
     var config={kitId:'azt6kde',scriptTimeout:3000,async:true},
@@ -310,7 +310,7 @@ const RAW=[
 const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 const RADIUS = IS_MOBILE ? 30 : 40;
 const FADE   = 0.2;
-const BLINK_SUPPRESS = IS_MOBILE ? 7 : 6;
+const BLINK_SUPPRESS = IS_MOBILE ? 3 : 0;
 const BLINK_THRESH   = IS_MOBILE ? 0.02 : 0.018;
 
 const dotEl  = document.getElementById('dot');
@@ -443,7 +443,7 @@ function startReader(mouseMode) {
 /* ── FaceMesh ── */
 let faceMesh, cam;
 const smoothBuf = [];
-const SMOOTH_N  = IS_MOBILE ? 8 : 12;
+const SMOOTH_N  = IS_MOBILE ? 8 : 7;
 let blinkCooldown = 0;
 const cal = [];
 let lastRaw = {x:.5, y:.5};
@@ -495,11 +495,15 @@ function initFaceMesh() {
     if (!lI||!rI) return;
     const lT=lm[159],lB=lm[145],rT=lm[386],rB=lm[374];
     if (lT&&lB&&rT&&rB) {
-      if ((Math.abs(lB.y-lT.y)+Math.abs(rB.y-rT.y))/2 < BLINK_THRESH) {
-        blinkCooldown = BLINK_SUPPRESS; return;
+      const openAvg = (Math.abs(lB.y-lT.y)+Math.abs(rB.y-rT.y))/2;
+      if (openAvg < BLINK_THRESH) {
+        blinkCooldown = BLINK_SUPPRESS;
+        // 깜빡임 중엔 위치 업데이트만 스킵, 점은 멈추지 않음 (이전 위치 유지)
+        return;
       }
     }
-    if (blinkCooldown>0) { blinkCooldown--; return; }
+    // cooldown 중에도 점은 이전 위치에 그대로 — return하지 않고 통과
+    if (blinkCooldown > 0) { blinkCooldown--; return; }
     let rx, ry;
     if (IS_MOBILE) {
       // 모바일: iris + 얼굴 중심 혼합 — 안정적이고 좌우 반응 좋음
