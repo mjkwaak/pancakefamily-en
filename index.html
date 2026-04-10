@@ -45,12 +45,9 @@ html,body{overflow:hidden;height:100%;background:#000;color:#fff;font-family:"ps
   justify-content:space-between;align-items:center}
 
 /* ── 리더 ── */
-#reader{
-  display:none;
-  position:fixed;inset:0;
-  display:none;
-  padding:40px 48px;
-}
+#reader{display:none;position:fixed;inset:0;padding:40px 48px}
+#reader-title{display:none}
+#txt-wrap{display:none}
 /* 타이틀 좌상단 고정 */
 #reader-title{
   position:fixed;top:40px;left:250px;
@@ -116,10 +113,9 @@ html,body{overflow:hidden;height:100%;background:#000;color:#fff;font-family:"ps
 <div id="bar"></div>
 <div id="sbar"><span id="sbar-l">—</span><span id="sbar-r">0% erased</span></div>
 
-<div id="reader">
-  <div id="reader-title"><span>The</span><span>Pancake</span><span>Family</span></div>
-  <div id="txt-wrap"><div id="txt"></div></div>
-</div>
+<div id="reader-title"><span>The</span><span>Pancake</span><span>Family</span></div>
+<div id="txt-wrap"><div id="txt"></div></div>
+<div id="reader"></div>
 
 <div id="scr-done">
   <p class="big">The book has vanished.</p>
@@ -425,6 +421,8 @@ function startReader(mouseMode) {
   document.getElementById('scr-start').style.display = 'none';
   document.getElementById('scr-cal').style.display   = 'none';
   document.getElementById('reader').style.display    = 'block';
+  document.getElementById('reader-title').style.display = 'flex';
+  document.getElementById('txt-wrap').style.display  = 'block';
   document.getElementById('sbar').style.display      = 'flex';
   if (mouseMode) {
     sbarL.textContent = 'Mouse mode';
