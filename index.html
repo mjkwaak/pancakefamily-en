@@ -87,7 +87,7 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 #scr-done p{font-family:'IBM Plex Mono',monospace;font-size:11px;
   color:#555;letter-spacing:0.2em;text-align:center;line-height:2}
 #scr-done .big{font-size:13px;color:#444}
-@media(max-width:600px){#scr-start{padding:20px 20px}#scr-start .title{font-size:22px}.btn{position:fixed;top:20px;left:50%;font-size:22px;padding:0}#reader-title{top:0;left:0;padding:20px 20px 20px;font-size:22px;line-height:1.05;letter-spacing:-0.01em;background:linear-gradient(to bottom,#000 75%,transparent);z-index:20;width:35%;pointer-events:auto;cursor:pointer}#txt-wrap{top:0;right:0;width:100%;padding:24vh 20px 60px 35%;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch}.para{font-size:13px;line-height:1.5;margin-bottom:1.4em}.spk-row{position:relative;margin-bottom:1.4em}.spk{position:absolute;right:calc(65% + 10px);top:2px;font-size:11px;color:#555;white-space:nowrap}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{padding-left:0}}</style>
+@media(max-width:600px){#scr-start{padding:20px 20px}#scr-start .title{font-size:17px}.btn{position:fixed;top:20px;left:50%;font-size:17px;padding:0}#reader-title{top:0;left:0;padding:20px 20px 20px;font-size:17px;line-height:1.05;letter-spacing:-0.01em;background:linear-gradient(to bottom,#000 75%,transparent);z-index:20;width:35%;pointer-events:auto;cursor:pointer}#txt-wrap{top:0;right:0;width:100%;padding:24vh 20px 60px 35%;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(to bottom,transparent 0,transparent 115px,black 140px);mask-image:linear-gradient(to bottom,transparent 0,transparent 115px,black 140px)}.para{font-size:13px;line-height:1.5;margin-bottom:1.4em}.spk-row{position:relative;margin-bottom:1.4em}.spk{position:absolute;right:calc(65% + 8px);top:2px;font-size:11px;color:#555;white-space:nowrap;max-width:calc(35% - 28px);overflow:hidden;text-overflow:ellipsis}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{padding-left:0}}</style>
 <script>
   (function(d){
     var config={kitId:'azt6kde',scriptTimeout:3000,async:true},
@@ -333,44 +333,8 @@ function moveGazeDot(x, y) {
 function buildText() {
   const c = document.getElementById('txt');
   c.innerHTML = ''; chars = [];
-  RAW.forEach(b => {
-    if (b.s) {
-      const row = document.createElement('div');
-      row.className = 'spk-row';
-      const sp = document.createElement('span');
-      sp.className = 'spk';
-      [...b.s].forEach(ch => {
-        const sc = document.createElement('span');
-        sc.className = 'ch'; sc.textContent = ch;
-        sp.appendChild(sc);
-        chars.push({el:sc, op:1, gone:false});
-      });
-      row.appendChild(sp);
-      const p = document.createElement('p');
-      p.className = 'para';
-      [...b.t].forEach(ch => {
-        const s = document.createElement('span');
-        s.className = 'ch'; s.textContent = ch;
-        p.appendChild(s);
-        chars.push({el:s, op:1, gone:false});
-      });
-      p.appendChild(document.createTextNode(' '));
-      row.appendChild(p);
-      c.appendChild(row);
-    } else {
-      const p = document.createElement('p');
-      p.className = 'para no-spk';
-      [...b.t].forEach(ch => {
-        const s = document.createElement('span');
-        s.className = 'ch'; s.textContent = ch;
-        p.appendChild(s);
-        chars.push({el:s, op:1, gone:false});
-      });
-      p.appendChild(document.createTextNode(' '));
-      c.appendChild(p);
-    }
-  });
-  // reader-title 글자도 소멸 대상
+
+  // reader-title 글자 소멸 대상
   const rTitle = document.getElementById('reader-title');
   if (rTitle) {
     rTitle.querySelectorAll('span').forEach(lineSpan => {
@@ -384,7 +348,57 @@ function buildText() {
       });
     });
   }
-  total = chars.length;
+
+  // 본문을 청크로 나눠 rAF로 분할 렌더링 → 렉 방지
+  const CHUNK = 10;
+  let idx = 0;
+  function renderChunk() {
+    const end = Math.min(idx + CHUNK, RAW.length);
+    for (; idx < end; idx++) {
+      const b = RAW[idx];
+      if (b.s) {
+        const row = document.createElement('div');
+        row.className = 'spk-row';
+        const sp = document.createElement('span');
+        sp.className = 'spk';
+        [...b.s].forEach(ch => {
+          const sc = document.createElement('span');
+          sc.className = 'ch'; sc.textContent = ch;
+          sp.appendChild(sc);
+          chars.push({el:sc, op:1, gone:false});
+        });
+        row.appendChild(sp);
+        const p = document.createElement('p');
+        p.className = 'para';
+        [...b.t].forEach(ch => {
+          const s = document.createElement('span');
+          s.className = 'ch'; s.textContent = ch;
+          p.appendChild(s);
+          chars.push({el:s, op:1, gone:false});
+        });
+        p.appendChild(document.createTextNode(' '));
+        row.appendChild(p);
+        c.appendChild(row);
+      } else {
+        const p = document.createElement('p');
+        p.className = 'para no-spk';
+        [...b.t].forEach(ch => {
+          const s = document.createElement('span');
+          s.className = 'ch'; s.textContent = ch;
+          p.appendChild(s);
+          chars.push({el:s, op:1, gone:false});
+        });
+        p.appendChild(document.createTextNode(' '));
+        c.appendChild(p);
+      }
+    }
+    if (idx < RAW.length) {
+      requestAnimationFrame(renderChunk);
+    } else {
+      total = chars.length;
+    }
+  }
+  renderChunk();
 }
 
 /* ── 프레임 루프 ── */
@@ -441,7 +455,7 @@ function startReader(mouseMode) {
 /* ── FaceMesh ── */
 let faceMesh, cam;
 const smoothBuf = [];
-const SMOOTH_N  = IS_MOBILE ? 4 : 6;
+const SMOOTH_N  = IS_MOBILE ? 8 : 12;
 let blinkCooldown = 0;
 const cal = [];
 let lastRaw = {x:.5, y:.5};
