@@ -150,14 +150,14 @@ html,body{height:100%;background:#000;color:#fff}
     z-index:20 !important
   }
 
-  /* 본문: interviewer 컬럼 공간 확보 후 본문 */
+  /* 본문 영역: 화면 50% 폭, 오른쪽 정렬 */
   #txt-wrap{
     top:0 !important;
-    left:130px !important;
+    left:auto !important;
     right:0 !important;
+    width:50% !important;
     bottom:0 !important;
-    width:auto !important;
-    padding:20px 12px 80px 8px !important;
+    padding:20px 12px 80px 0 !important;
     overflow-y:scroll !important;
     -webkit-overflow-scrolling:touch !important;
     overscroll-behavior-y:contain !important
@@ -169,20 +169,22 @@ html,body{height:100%;background:#000;color:#fff}
     margin-bottom:1.4em !important;
     color:#fff !important
   }
-  /* interviewer 행: grid로 왼쪽에 spk, 오른쪽에 본문 */
+  /* 모든 행 본문 시작선 통일, interviewer는 본문 바로 왼쪽 */
   .spk-row{
-    display:grid !important;
-    grid-template-columns:52px 1fr !important;
-    column-gap:8px !important;
+    display:block !important;
+    position:relative !important;
     margin-bottom:1.4em !important
   }
   .spk{
+    position:absolute !important;
+    right:100% !important;
+    top:2px !important;
+    padding-right:8px !important;
     font-size:13px !important;
     color:#555 !important;
-    padding-top:2px !important;
-    word-break:break-all !important
+    white-space:nowrap !important
   }
-  .spk-row .para{grid-column:2 !important;margin:0 !important}
+  .spk-row .para{margin:0 !important}
   .para.no-spk{padding-left:0 !important}
 }
 </style>
