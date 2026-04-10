@@ -377,7 +377,7 @@ function startReader(mouseMode) {
 /* ── FaceMesh ── */
 let faceMesh, cam;
 const smoothBuf = [];
-const SMOOTH_N  = IS_MOBILE ? 3 : 12;
+const SMOOTH_N  = IS_MOBILE ? 3 : 7;
 let blinkCooldown = 0;
 const cal = [];
 let lastRaw = {x:.5, y:.5};
@@ -436,7 +436,23 @@ function initFaceMesh() {
       }
     }
     if (blinkCooldown>0) { blinkCooldown--; return; }
-    const rx=1-(lI.x+rI.x)/2, ry=(lI.y+rI.y)/2;
+    let rx, ry;
+    if (IS_MOBILE) {
+      // 모바일: 눈 코너 대비 iris 상대 비율 — 좌우 움직임 민감도 향상
+      const lInner=lm[133],lOuter=lm[33],rInner=lm[362],rOuter=lm[263];
+      const lW=Math.abs(lOuter.x-lInner.x), rW=Math.abs(rOuter.x-rInner.x);
+      const lRx=lW>0.001?(lI.x-lInner.x)/lW:0.5;
+      const rRx=rW>0.001?(rI.x-rInner.x)/rW:0.5;
+      // Y는 눈 높이 대비 비율
+      const lH=Math.abs(lB.y-lT.y), rH=Math.abs(rB.y-rT.y);
+      const lRy=lH>0.001?(lI.y-lT.y)/lH:0.5;
+      const rRy=rH>0.001?(rI.y-rT.y)/rH:0.5;
+      rx = 1-((lRx+rRx)/2);
+      ry = (lRy+rRy)/2;
+    } else {
+      rx = 1-(lI.x+rI.x)/2;
+      ry = (lI.y+rI.y)/2;
+    }
     lastRaw = {x:rx, y:ry};
     const sm = smoothGaze(rx, ry);
     const mp = mapGaze(sm.x, sm.y);
@@ -447,13 +463,8 @@ function initFaceMesh() {
 function startCam() {
   const v = document.getElementById('vid');
   v.style.display = 'block';
-  let skip = 0;
   cam = new Camera(v, {
     onFrame: async () => {
-      if (IS_MOBILE) {
-        skip++;
-        if (skip % 2 !== 0) return;
-      }
       await faceMesh.send({image:v});
     },
     width: IS_MOBILE ? 320 : 640, height: IS_MOBILE ? 240 : 480,
