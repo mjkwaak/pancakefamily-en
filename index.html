@@ -87,7 +87,7 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 #scr-done p{font-family:'IBM Plex Mono',monospace;font-size:11px;
   color:#555;letter-spacing:0.2em;text-align:center;line-height:2}
 #scr-done .big{font-size:13px;color:#444}
-@media(max-width:600px){#scr-start{padding:20px 20px}#scr-start .title{font-size:17px}.btn{position:fixed;top:20px;left:50%;font-size:17px;padding:0}#reader-title{top:0;left:0;padding:20px 20px 20px;font-size:17px;line-height:1.05;letter-spacing:-0.01em;background:linear-gradient(to bottom,#000 75%,transparent);z-index:20;width:35%;pointer-events:auto;cursor:pointer}#txt-wrap{top:0;right:0;width:100%;padding:24vh 20px 60px 35%;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(to bottom,transparent 0,transparent 115px,black 140px);mask-image:linear-gradient(to bottom,transparent 0,transparent 115px,black 140px)}.para{font-size:13px;line-height:1.5;margin-bottom:1.4em}.spk-row{position:relative;margin-bottom:1.4em}.spk{position:absolute;right:calc(65% + 8px);top:2px;font-size:11px;color:#555;white-space:nowrap;max-width:calc(35% - 28px);overflow:hidden;text-overflow:ellipsis}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{padding-left:0}}</style>
+@media(max-width:600px){#scr-start{padding:20px 20px}#scr-start .title{font-size:17px}.btn{position:fixed;top:20px;left:50%;font-size:17px;padding:0}#reader-title{top:0;left:0;padding:20px 20px 20px;font-size:17px;line-height:1.05;letter-spacing:-0.01em;background:#000;z-index:20;width:40%;pointer-events:auto;cursor:pointer}#txt-wrap{position:fixed;top:24vh;right:0;bottom:0;width:100%;padding:0 20px 60px 40%;overflow-y:auto;-webkit-overflow-scrolling:touch}.para{font-size:13px;line-height:1.5;margin-bottom:1.4em}.spk-row{display:grid;grid-template-columns:80px 1fr;column-gap:10px;margin-left:-90px;margin-bottom:1.4em}.spk{font-size:11px;color:#555;padding-top:2px;grid-column:1}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{padding-left:0;margin-left:0}}</style>
 <script>
   (function(d){
     var config={kitId:'azt6kde',scriptTimeout:3000,async:true},
@@ -349,56 +349,47 @@ function buildText() {
     });
   }
 
-  // 본문을 청크로 나눠 rAF로 분할 렌더링 → 렉 방지
-  const CHUNK = 10;
-  let idx = 0;
-  function renderChunk() {
-    const end = Math.min(idx + CHUNK, RAW.length);
-    for (; idx < end; idx++) {
-      const b = RAW[idx];
-      if (b.s) {
-        const row = document.createElement('div');
-        row.className = 'spk-row';
-        const sp = document.createElement('span');
-        sp.className = 'spk';
-        [...b.s].forEach(ch => {
-          const sc = document.createElement('span');
-          sc.className = 'ch'; sc.textContent = ch;
-          sp.appendChild(sc);
-          chars.push({el:sc, op:1, gone:false});
-        });
-        row.appendChild(sp);
-        const p = document.createElement('p');
-        p.className = 'para';
-        [...b.t].forEach(ch => {
-          const s = document.createElement('span');
-          s.className = 'ch'; s.textContent = ch;
-          p.appendChild(s);
-          chars.push({el:s, op:1, gone:false});
-        });
-        p.appendChild(document.createTextNode(' '));
-        row.appendChild(p);
-        c.appendChild(row);
-      } else {
-        const p = document.createElement('p');
-        p.className = 'para no-spk';
-        [...b.t].forEach(ch => {
-          const s = document.createElement('span');
-          s.className = 'ch'; s.textContent = ch;
-          p.appendChild(s);
-          chars.push({el:s, op:1, gone:false});
-        });
-        p.appendChild(document.createTextNode(' '));
-        c.appendChild(p);
-      }
-    }
-    if (idx < RAW.length) {
-      requestAnimationFrame(renderChunk);
+  // DocumentFragment로 한 번에 추가 — reflow 최소화
+  const frag = document.createDocumentFragment();
+  RAW.forEach(b => {
+    if (b.s) {
+      const row = document.createElement('div');
+      row.className = 'spk-row';
+      const sp = document.createElement('span');
+      sp.className = 'spk';
+      [...b.s].forEach(ch => {
+        const sc = document.createElement('span');
+        sc.className = 'ch'; sc.textContent = ch;
+        sp.appendChild(sc);
+        chars.push({el:sc, op:1, gone:false});
+      });
+      row.appendChild(sp);
+      const p = document.createElement('p');
+      p.className = 'para';
+      [...b.t].forEach(ch => {
+        const s = document.createElement('span');
+        s.className = 'ch'; s.textContent = ch;
+        p.appendChild(s);
+        chars.push({el:s, op:1, gone:false});
+      });
+      p.appendChild(document.createTextNode(' '));
+      row.appendChild(p);
+      frag.appendChild(row);
     } else {
-      total = chars.length;
+      const p = document.createElement('p');
+      p.className = 'para no-spk';
+      [...b.t].forEach(ch => {
+        const s = document.createElement('span');
+        s.className = 'ch'; s.textContent = ch;
+        p.appendChild(s);
+        chars.push({el:s, op:1, gone:false});
+      });
+      p.appendChild(document.createTextNode(' '));
+      frag.appendChild(p);
     }
-  }
-  renderChunk();
+  });
+  c.appendChild(frag);
+  total = chars.length;
 }
 
 /* ── 프레임 루프 ── */
@@ -445,11 +436,8 @@ function startReader(mouseMode) {
     dotEl.style.background = 'rgba(200,75,30,.8)';
     dotEl.style.visibility = 'visible';
   }
-  // buildText를 다음 프레임에 실행해서 보정 완료 딜레이 방지
-  requestAnimationFrame(() => {
-    buildText();
-    requestAnimationFrame(tick);
-  });
+  buildText();
+  requestAnimationFrame(tick);
 }
 
 /* ── FaceMesh ── */
