@@ -87,7 +87,7 @@ html,body{background:#000;color:#fff;font-family:"psfournier-std",sans-serif;min
 #scr-done p{font-family:'IBM Plex Mono',monospace;font-size:11px;
   color:#555;letter-spacing:0.2em;text-align:center;line-height:2}
 #scr-done .big{font-size:13px;color:#444}
-@media(max-width:600px){#scr-start{padding:20px 20px}#scr-start .title{font-size:22px}.btn{position:fixed;top:20px;left:50%;font-size:22px;padding:0}#reader-title{top:0;left:0;padding:20px 20px 20px;font-size:22px;background:linear-gradient(to bottom, #000 70%, transparent);z-index:20;width:35%;pointer-events:auto;cursor:pointer}#txt-wrap{top:0;right:0;width:65%;padding:24vh 20px 60px;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch}.para{font-size:13px;line-height:1.5;margin-bottom:1.4em}.spk-row{grid-template-columns:70px 1fr;column-gap:10px;margin-bottom:1.4em;margin-left:-80px}.spk{font-size:13px}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{padding-left:0}}</style>
+@media(max-width:600px){#scr-start{padding:20px 20px}#scr-start .title{font-size:22px}.btn{position:fixed;top:20px;left:50%;font-size:22px;padding:0}#reader-title{top:0;left:0;padding:20px 20px 20px;font-size:22px;line-height:1.05;letter-spacing:-0.01em;background:linear-gradient(to bottom,#000 75%,transparent);z-index:20;width:35%;pointer-events:auto;cursor:pointer}#txt-wrap{top:0;right:0;width:65%;padding:24vh 20px 60px;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch}.para{font-size:13px;line-height:1.5;margin-bottom:1.4em}.spk-row{position:relative;grid-template-columns:1fr;margin-bottom:1.4em;padding-left:0}.spk{position:absolute;right:calc(100% + 10px);top:0;font-size:11px;color:#555;white-space:nowrap;width:auto}.spk-row .para{margin-top:0;margin-bottom:0}.para.no-spk{padding-left:0}}</style>
 <script>
   (function(d){
     var config={kitId:'azt6kde',scriptTimeout:3000,async:true},
@@ -431,8 +431,11 @@ function startReader(mouseMode) {
     dotEl.style.background = 'rgba(200,75,30,.8)';
     dotEl.style.visibility = 'visible';
   }
-  buildText();
-  requestAnimationFrame(tick);
+  // buildText를 다음 프레임에 실행해서 보정 완료 딜레이 방지
+  requestAnimationFrame(() => {
+    buildText();
+    requestAnimationFrame(tick);
+  });
 }
 
 /* ── FaceMesh ── */
@@ -584,11 +587,8 @@ function setupCalDots() {
         if (calIdx<pos.length) {
           calDots[calIdx].classList.remove('off');
         } else {
-          // 마지막 점 처리 후 한 프레임 쉬고 시작 (렉 방지)
-          setTimeout(() => {
-            buildMapCoef();
-            startReader(false);
-          }, 50);
+          buildMapCoef();
+          startReader(false);
         }
       } catch(err) { console.error('calTap error:', err); }
     };
